@@ -80,4 +80,7 @@ footer { margin-top: 56px; color: var(--muted); font-size: 0.85rem; }
   h1 { font-size: 1.8rem; }
 }
 ul.exp strong { font-weight: 500; }
+ul.exp li { align-items: baseline; }
+ul.exp .desc { display: block; text-align: left; margin-top: 2px; }
+ul.exp .dates { white-space: nowrap; }
 .bio a { color: var(--accent); text-underline-offset: 3px; }
