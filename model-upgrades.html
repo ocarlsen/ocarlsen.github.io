@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Upgrading production models without guessing | Owen Carlsen</title>
+<meta name="description" content="How I pin, benchmark and blind-judge LLM upgrades in production, and what changed besides quality.">
+<meta property="og:title" content="Upgrading production models without guessing">
+<meta property="og:description" content="How I pin, benchmark and blind-judge LLM upgrades in production, and what changed besides quality.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.ocarlsen.com/model-upgrades.html">
+<meta property="og:image" content="https://www.ocarlsen.com/owen.jpg">
+<link rel="canonical" href="https://www.ocarlsen.com/model-upgrades.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<main class="post">
+  <p class="back"><a href="index.html">&larr; Owen Carlsen</a></p>
+  <h1>Upgrading production models without guessing</h1>
+  <p class="byline">Owen Carlsen &middot; Oct 2026</p>
+<p>Every few weeks, one of the model vendors I depend on ships something new. At first I read the announcement, tried a few prompts, and switched if it felt better. That works until a new model is worse at your task and a user tells you.</p>
+
+<p>The company I run operates on LLM pipelines: email and Slack triage, code review, captions, images, video and invoices. So I built a process for it. A job checks every vendor's model list every hour. When a newer model appears in a slot I use, I get a one-tap prompt to benchmark it against the current model on a frozen set of my own tasks. Nothing switches until a blind comparison supports it. The switch is a pull request I review, and the canaries that already watch every job's behavior keep watching it afterward.</p>
+
+<h2>Pin every model</h2>
+
+<p>Every job calls an exact model version. None uses a floating "latest" alias. An alias is an upgrade you never approved. If a vendor repoints it, your job changes behavior overnight and nothing in your repo says why. Some vendors make this easy to avoid. Anthropic now ships every model ID as "a pinned snapshot" (<a href="https://platform.claude.com/docs/en/about-claude/models/overview">Anthropic, "Models overview"</a>). That doesn't stop your own code from defining a "latest" of its own.</p>
+
+<p>Each pin belongs to a slot, a named role such as "the model that drafts captions" or "the model that judges code reviews", and the pins live in one registry in code. Once an hour, a watcher compares each vendor's published model list against that registry and flags two things: a pinned model the vendor no longer lists, and a newer model from the same family as one I've pinned. It also reads the vendors' announcement feeds, and it makes no model calls.</p>
+
+<p>The watcher doesn't run anything itself. It posts a note to Slack with a one-tap button, and the benchmark runs only when I tap it.</p>
+
+<h2>Benchmark on your own work</h2>
+
+<p>Public leaderboards tell you which model does best on average, on tasks someone else chose. I need to know whether a model is better at my jobs. So each production job has its own benchmark harness, built from a frozen set of inputs: real ones where I have them, synthetic cases where I don't.</p>
+
+<p>A single command takes any one harness and runs its frozen inputs through two models: the one in production now and the candidate. Before it spends anything, it estimates the cost of the run, scaled by the candidate's price, and refuses to start if the estimate is over a fixed cap.</p>
+
+<p>When I tested which model should judge my phone agent's answers for fabrication, against 99 answers I had labeled by hand, the newest flagship agreed with my labels less often than the older one it would have replaced (83.8% against 88.9%), and it passed an answer containing an invented product detail that the older one caught. If that judge had followed a "latest" alias, it would have gotten worse on the day of the release.</p>
+
+<h2>Judge blind</h2>
+
+<p>Captions, images and video are judgment calls, so I judge them myself, on a voting page the harness builds for each run. It shows each pair of outputs as A and B, randomized per input, with the key held on the server so I can't peek. I vote A, B or tie, and the tally appears only after every input has a vote.</p>
+
+<p>Text tasks like code review use a model as judge, itself pinned so results stay comparable across dates. Each synthetic case has known defects planted in it. The judge sees only the list of planted defects and the review's findings, with no model names, and reports which planted defects the review caught and how many other findings it raised. I call those unplanted flags rather than false positives, because some of them may be real.</p>
+
+<h2>The first decision was a tie</h2>
+
+<p>The first candidate through the pipeline was a newer OpenAI model for the caption slot, a public-facing job that runs every time the company posts. At OpenAI's published prices it cost half as much as the model it would replace: $2 per million input tokens against $4, and $10 per million output tokens against $20 (<a href="https://developers.openai.com/api/docs/pricing">OpenAI, "Pricing"</a>).</p>
+
+<p>At half the price it only had to match the current model, so I judged it on captions, the job it would do.</p>
+
+<p>Over 13 frozen inputs, the new model won 5, the current one won 4, and 4 were ties. I called that a tie and switched.</p>
+
+<p>Thirteen votes can only catch a large regression. A modest one would not show at that size. A side check on code review pointed the same way: across 12 planted defects the new model caught 9 and the current one caught 10, while the new model raised about a third as many unplanted flags.</p>
+
+<p>I accepted the remaining uncertainty because the downside was bounded. Each post starts from five candidate captions, each drafted by a different model, and a person picks one and edits it. The OpenAI model writes only one of the five, so a weaker model loses picks, not posts. The behavior canaries that watch every job kept watching this one, and rolling back is reverting one pull request. In the two weeks since, it has run cleanly every time.</p>
+
+<p>The pipeline has also rejected a candidate. A later one from another vendor lost 4 to 6, with 3 ties, and I kept the current model.</p>
+
+<h2>What changes besides quality</h2>
+
+<p><strong>Defaults change.</strong> When I moved from Claude Sonnet 5 to Claude Sonnet 5.5, a request with no thinking setting started thinking: on Sonnet 5.5, adaptive thinking is on by default, at high effort (<a href="https://platform.claude.com/docs/en/models/sonnet-5-5/whats-new-sonnet-5-5">Anthropic, "What's new in Claude Sonnet 5.5"</a>). My calls never set it, so each one began spending about 360 to 670 thinking tokens, billed as output, before writing a short answer. Turning it off took a value that hadn't existed before: on Sonnet 5.5, the old <code>"disabled"</code> setting returns an error, and the lowest setting is a new one, <code>"between_tools"</code>. With that set explicitly, output came back to about 150 tokens.</p>
+
+<p><strong>Token counts change.</strong> When I benchmarked a triage job moving from Claude Haiku 4.5 to Claude Haiku 5.5, the same 78 inputs counted about 53% more input tokens. Anthropic's docs put the new tokenizer's increase at approximately 30% and add that "the exact increase depends on the content" (<a href="https://platform.claude.com/docs/en/models/haiku-5-5/whats-new-haiku-5-5">Anthropic, "What's new in Claude Haiku 5.5"</a>). In that case the per-token price had dropped tenfold, from $1 to $0.10 per million input tokens (<a href="https://platform.claude.com/docs/en/about-claude/pricing">Anthropic, "Pricing"</a>), so the job still got about six times cheaper. Rerun your own inputs and compare the bill.</p>
+
+<h2>At a team's scale</h2>
+
+<p>I built this alone, and a single judge voting on 13 inputs is what one person can afford. The shape is the staged release I've run for years on larger systems, from QA through UAT to production, with sign-off from the teams that depend on it, and a model bump deserves the same gate. With a team, I'd keep that shape and change the scale:</p>
+
+<ul>
+  <li>The pin registry stays in code, with an owner for each slot, and every bump is a reviewed pull request that links its eval.</li>
+  <li>Each team owns the frozen eval set for the jobs it runs, and grows it from real failures.</li>
+  <li>Blind human judging rotates across reviewers, with enough samples to detect the size of regression that matters and to measure whether the reviewers agree.</li>
+  <li>A bump reaches one job or a slice of traffic first, behind the same behavior canaries, with a one-step revert.</li>
+  <li>Cost caps are per run and per team, checked before the run starts.</li>
+</ul>
+
+<p>A model upgrade is a deploy. It gets a diff, a test and a reviewer.</p>
+
+<p class="sources">Numbers about my own pipeline (votes, scores, token counts and run costs) come from its benchmark result files, pull requests and decision log, checked October 17, 2026. They are private, so they are not linked. Vendor prices and defaults are as published on the dates checked.</p>
+  <footer>&copy; 2026 Owen Carlsen</footer>
+</main>
+</body>
+</html>
