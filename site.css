@@ -99,4 +99,19 @@ main.post p { margin: 0 0 16px; }
 main.post ul { margin: 0 0 16px; padding-left: 22px; }
 main.post li { margin: 0 0 8px; }
 main.post code { font-size: 0.9em; background: var(--card); border: 1px solid var(--rule); border-radius: 4px; padding: 0 4px; }
+.written { color: var(--muted); font-size: 0.88rem; font-style: italic; margin-top: 32px; }
 .sources { color: var(--muted); font-size: 0.88rem; margin-top: 40px; border-top: 1px solid var(--rule); padding-top: 16px; }
+
+/* Essay extras (the FrontDesk article): standfirst, figures, tables, code blocks */
+main.post .dek { color: var(--muted); font-size: 1.05rem; }
+main.post figure { margin: 24px 0; }
+main.post figure img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 10px; }
+main.post figcaption { color: var(--muted); font-size: 0.88rem; line-height: 1.5; margin-top: 8px; }
+main.post .table-wrap { overflow-x: auto; margin: 12px 0 16px; }
+main.post table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+main.post th, main.post td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+main.post th { color: var(--muted); font-weight: 600; }
+main.post td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+main.post pre { font-size: 0.82rem; line-height: 1.5; background: var(--card); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 14px; overflow-x: auto; }
+main.post pre code, main.post pre { font-family: ui-monospace, Menlo, monospace; }
+main.post ol { margin: 0 0 16px; padding-left: 22px; }
