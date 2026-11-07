@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What I built at Claire Daily Health | Owen Carlsen</title>
+<meta name="description" content="The LLM pipelines, agents, evals and model-upgrade process I built as founder and sole engineer of Claire Daily Health.">
+<meta property="og:title" content="What I built at Claire Daily Health">
+<meta property="og:description" content="The LLM pipelines, agents, evals and model-upgrade process I built as founder and sole engineer of Claire Daily Health.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.ocarlsen.com/cdh.html">
+<meta property="og:image" content="https://www.ocarlsen.com/owen.jpg">
+<link rel="canonical" href="https://www.ocarlsen.com/cdh.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<main class="post">
+  <p class="back"><a href="index.html">&larr; Owen Carlsen</a></p>
+  <h1>What I built at Claire Daily Health</h1>
+  <p class="byline">Owen Carlsen &middot; Nov 2026</p>
+<p>From June 2026 I was the founder and sole engineer of Claire Daily Health, which began as a plan for a regulated telehealth brand. In October I paused the product launch. The pipelines still run, and this page describes what they do.</p>
+
+<h2>What runs</h2>
+
+<p>I built it with Claude Code, in Python, on the Anthropic, OpenAI and Gemini APIs, with jobs scheduled by launchd. The company's day-to-day work runs on LLM pipelines I designed: email and Slack triage, daily briefs, social content and PR review. That is over 100 scheduled jobs and over 10,000 model runs since late June. About half of the jobs are canaries that check the state the others leave behind.</p>
+
+<h2>Agents and evals</h2>
+
+<p>I built the company's AI voice and chat agents and an eval harness for them. An LLM judge scores each answer, and the evals require answers grounded in the company's own content, with zero-tolerance gates on fabrication, medical advice and privacy. The harness recorded 452 results, all on the chat agent.</p>
+
+<h2>Model upgrades</h2>
+
+<p>A job checks every vendor hourly for new releases, and an approved candidate runs blind against the current model on the company's own tasks. The first one moved a production model to a newer release at half the price. I wrote up how it works in <a href="model-upgrades.html">Upgrading production models without guessing</a>. I also built <a href="https://github.com/ocarlsen/pinbench">pinbench</a>, an open-source CLI that runs the same blind, cost-capped A/B test on your own inputs before a job switches models.</p>
+
+<h2>Cost and memory</h2>
+
+<p>I cut the Slack agent's cost per reply by over a third by moving rarely used sections of its prompt into files it loads on demand. Each project's memory goes to the agents that read it, and a canary flags any memory store that nothing loads.</p>
+
+<h2>Parallel sessions</h2>
+
+<p>I ran many Claude Code sessions in parallel, one per project. The tooling that keeps their memory current across sessions, and lets me answer them all from one session, is open source as <a href="https://github.com/ocarlsen/session-notes">session-notes</a>.</p>
+  <p class="written">How this was written: Claude drafted from my notes; I edited the draft and checked every claim against the code and logs.</p>
+  <footer>&copy; 2026 Owen Carlsen</footer>
+</main>
+</body>
+</html>
