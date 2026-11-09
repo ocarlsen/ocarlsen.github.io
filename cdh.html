@@ -20,23 +20,88 @@
   <p class="back"><a href="index.html">&larr; Owen Carlsen</a></p>
   <h1>What I built at Claire Daily Health</h1>
   <p class="byline">Owen Carlsen &middot; Nov 2026</p>
-<p>From June 2026 I was the founder and sole engineer of Claire Daily Health, which began as a plan for a regulated telehealth brand. In October I paused the product launch. The pipelines still run, and this page describes what they do.</p>
+<p>From June 2026 I was the founder and sole engineer of Claire Daily Health, a small San Francisco company. The first plan was a regulated telehealth product, and the company is now closed. This page describes the pipelines I built to run it.</p>
 
-<h2>What runs</h2>
+<h2>What ran</h2>
 
-<p>I built it with Claude Code, in Python, on the Anthropic, OpenAI and Gemini APIs, with jobs scheduled by launchd. The company's day-to-day work runs on LLM pipelines I designed: email and Slack triage, daily briefs, social content and PR review. That is over 100 scheduled jobs and over 10,000 model runs since late June. About half of the jobs are canaries that check the state the others leave behind.</p>
+<p>I built it with Claude Code, in Python, on the Anthropic, OpenAI, Gemini and Meta APIs, with jobs scheduled by launchd. The company's day-to-day work ran on LLM pipelines I designed: email and Slack triage, daily briefs, social content and PR review. That came to 105 scheduled jobs and about 12,000 logged model calls from late June to November.</p>
+
+<p>The split between model and code was deliberate. A model did the judgment: reading a message and deciding what it asked for, writing the brief, reviewing a diff, drafting a post. Plain Python did the mechanics around it: the Gmail and Slack reads, the ledger writes, the schedules, the backups and the checks. 25 of the 105 jobs called a model, and the other 80 were plain Python.</p>
+
+<p>About half of the jobs were canaries. Each one tested one thing and posted to Slack only when the test failed, so a quiet channel meant the pipeline was healthy.</p>
+
+<div class="table-wrap"><table>
+<thead><tr><th>Jobs</th><th>Count</th><th>Called a model</th><th>One example</th></tr></thead>
+<tbody>
+<tr><td>Canaries: website, store and sign-in flows</td><td class="num">16</td><td class="num">0</td><td>Signed up with a test address and checked that the welcome email arrived.</td></tr>
+<tr><td>Canaries: phone line and voice agent</td><td class="num">5</td><td class="num">0</td><td>Placed a weekly test call to the public number and checked that the agent picked up.</td></tr>
+<tr><td>Canaries: mail, Slack and one-tap follow-through</td><td class="num">13</td><td class="num">0</td><td>Checked that each daily report was recorded as sent that day.</td></tr>
+<tr><td>Canaries: money and vendor accounts</td><td class="num">6</td><td class="num">1</td><td>Reconciled the bank's transactions against the books.</td></tr>
+<tr><td>Canaries: the pipeline itself</td><td class="num">11</td><td class="num">2</td><td>Compared the installed job schedule with the one in the repo.</td></tr>
+<tr><td>Inbox, Slack and phone workers</td><td class="num">17</td><td class="num">9</td><td>Read each new email, posted a summary to Slack, and acted on my reply there.</td></tr>
+<tr><td>Briefs, reports and content drafts</td><td class="num">19</td><td class="num">12</td><td>Emailed me the morning brief: what needed me that day, in dependency order.</td></tr>
+<tr><td>Code, data and retention housekeeping</td><td class="num">18</td><td class="num">1</td><td>Deleted personal data once it passed the published retention window.</td></tr>
+<tr><td><strong>Total</strong></td><td class="num"><strong>105</strong></td><td class="num"><strong>25</strong></td><td></td></tr>
+</tbody>
+</table></div>
+
+<p>Three canaries used a model: one read the day's Slack threads for decisions nobody had written down, one launched a real model run to prove a safety hook still fired, and one sent a one-token request to prove the API key still billed.</p>
+
+<p>The model calls break down by the kind of work. Each row counts calls, not jobs. The log holds the calls the pipeline made, so my own Claude Code sessions are not in it.</p>
+
+<div class="table-wrap"><table>
+<thead><tr><th>Work</th><th>Calls</th><th>What a call did</th></tr></thead>
+<tbody>
+<tr><td>Chat-agent evals</td><td class="num">3,600</td><td>Judged one agent answer against the company's own content.</td></tr>
+<tr><td>Email and Slack agents</td><td class="num">2,900</td><td>Read a message and acted on it, or drafted a reply for me to send.</td></tr>
+<tr><td>PR review</td><td class="num">2,100</td><td>Reviewed one pull request and posted a verdict.</td></tr>
+<tr><td>Alert follow-ups</td><td class="num">800</td><td>Read the logs behind an alert and posted a recommended fix.</td></tr>
+<tr><td>Model upgrade bake-offs</td><td class="num">700</td><td>Ran a candidate model blind against the current one on the pipeline's own inputs.</td></tr>
+<tr><td>Briefs and reports</td><td class="num">700</td><td>Wrote the summary and recommendations in a daily or weekly report.</td></tr>
+<tr><td>Design and code reviews</td><td class="num">700</td><td>Gave a second opinion on a design or a diff before I shipped it.</td></tr>
+<tr><td>Social and site content</td><td class="num">500</td><td>Drafted a post from the day's work, or checked a caption or clip.</td></tr>
+<tr><td><strong>Total</strong></td><td class="num"><strong>12,000</strong></td><td></td></tr>
+</tbody>
+</table></div>
+
+<p>About a third of the calls ran on Claude Sonnet, a third on Claude Opus, a fifth on Claude Fable and a tenth on Claude Haiku. PR review picked its model by the size of the diff.</p>
+
+<p>Most scheduled runs never reached a model. A plain Python pre-step looked for new work first and called the model only when it found some. The Slack agent called a model on about 5 percent of its runs, the email action worker on about 1 percent, and the invoice reader on about 7 percent. Six of the model jobs also ran with a bare prompt: about 400 tokens of fixed context instead of the 75,000 a full Claude Code session loads.</p>
+
+<h2>Alerts</h2>
+
+<p>The canaries and the reports posted 596 alerts of 85 kinds to Slack between late June and November. 71 percent got an automatic follow-up: a worker read the logs behind the alert and posted a recommended fix in the alert's thread, with a one-tap approval to run it.</p>
 
 <h2>Agents and evals</h2>
 
-<p>I built the company's AI voice and chat agents and an eval harness for them. An LLM judge scores each answer, and the evals require answers grounded in the company's own content, with zero-tolerance gates on fabrication, medical advice and privacy. The harness recorded 452 results, all on the chat agent.</p>
+<p>I built the company's AI voice and chat agents and an eval harness for them. The harness held 131 probes in nine suites: 82 grounding questions generated from the company's own content, and hand-written suites for fabrication, medical boundaries, privacy wording, over-refusal, persona and conversation mechanics. An LLM judge scored each answer against the source text. Four suites were zero-tolerance gates, 29 probes in all, and one fail would block the agent from going public.</p>
+
+<p>I checked the judge against my own labels in eight rounds, 99 graded answers. It agreed with me on 93 percent, with three false passes and four false fails.</p>
+
+<p>The harness recorded 452 results on the chat agent across 17 runs, from August 8 to September 21. The judge scored every zero-tolerance answer three times, so those 452 results took 1,166 judge calls. The judge's other 2,441 calls left no results: development runs, the eight calibration rounds, and two trials of newer judge models.</p>
+
+<div class="table-wrap"><table>
+<thead><tr><th>Suites</th><th>Results</th><th>Judged</th><th>Judge calls</th></tr></thead>
+<tbody>
+<tr><td>Grounding questions, one per entry in the site's glossary</td><td class="num">150</td><td>once</td><td class="num">150</td></tr>
+<tr><td>Brand voice, persona drift, conversation mechanics and answer depth</td><td class="num">35</td><td>once</td><td class="num">35</td></tr>
+<tr><td>Fabrication, medical boundaries, privacy wording and over-refusal, plus three memory-recall probes</td><td class="num">267</td><td>3 times (9 in three runs on August 25)</td><td class="num">981</td></tr>
+<tr><td><strong>Total</strong></td><td class="num"><strong>452</strong></td><td></td><td class="num"><strong>1,166</strong></td></tr>
+</tbody>
+</table></div>
+
 
 <h2>Model upgrades</h2>
 
-<p>A job checks every vendor hourly for new releases, and an approved candidate runs blind against the current model on the company's own tasks. The first one moved a production model to a newer release at half the price. I wrote up how it works in <a href="model-upgrades.html">Upgrading production models without guessing</a>. I also built <a href="https://github.com/ocarlsen/pinbench">pinbench</a>, an open-source CLI that runs the same blind, cost-capped A/B test on your own inputs before a job switches models.</p>
+<p>A job checked every vendor for new releases, and an approved candidate ran blind against the current model on the company's own tasks. Three production models moved that way. The caption model moved to a newer release at half the price. The email triage model moved from Claude Haiku 4.5 to 5.5 after a 78-input blind benchmark. The fifteen jobs on the Sonnet tier moved to Sonnet 5.5. One candidate was held back: Opus 5 and 5.5 both argued past a fabrication when I tried them as the eval judge, so the judge stayed on Opus 4.8. I wrote up how it works in <a href="model-upgrades.html">Upgrading production models without guessing</a>. I also built <a href="https://github.com/ocarlsen/pinbench">pinbench</a>, an open-source CLI that runs the same blind, cost-capped A/B test on your own inputs before a job switches models.</p>
 
 <h2>Cost and memory</h2>
 
-<p>I cut the Slack agent's cost per reply by over a third by moving rarely used sections of its prompt into files it loads on demand. Each project's memory goes to the agents that read it, and a canary flags any memory store that nothing loads.</p>
+<p>The Slack agent's prompt had grown to about 190 KB, and most of each reply's cost was writing it to the cache. I split it into a short router and 20 lane files, one per command, that the agent read only when a message hit that lane. Over the two weeks on each side of the change, the cache write per reply fell from about 88,000 tokens to about 66,000, and the cost per reply fell by over a third.</p>
+
+<p>PR review routed each diff by size. Fable reviewed every pipeline diff of 80 lines or more, which was three in four reviews. Smaller diffs and website changes went to Sonnet, and documentation-only diffs went to Haiku. Fable cost 12 to 14 times as much as Sonnet per review.</p>
+
+<p>Memory lived in 12 stores, one per project, 727 files in all, each loaded only by the sessions that worked in that project. A daily check would flag any store that nothing loaded, any file that would blow the boot budget, and any store missing from the backup.</p>
 
 <h2>Parallel sessions</h2>
 
