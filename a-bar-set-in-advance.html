@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A bar set in advance | Owen Carlsen</title>
+<meta name="description" content="What over 100 scheduled jobs ran at Claire Daily Health, where the agents failed, the demand bar I set before the production order, and the code I am publishing.">
+<meta property="og:title" content="A bar set in advance">
+<meta property="og:description" content="What over 100 scheduled jobs ran at Claire Daily Health, where the agents failed, the demand bar I set before the production order, and the code I am publishing.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.ocarlsen.com/a-bar-set-in-advance.html">
+<meta property="og:image" content="https://www.ocarlsen.com/owen.jpg">
+<link rel="canonical" href="https://www.ocarlsen.com/a-bar-set-in-advance.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+<link rel="stylesheet" href="site.css">
+<link rel="alternate" type="application/atom+xml" title="Owen Carlsen" href="feed.xml">
+</head>
+<body>
+<main class="post">
+  <p class="back"><a href="index.html">&larr; Owen Carlsen</a></p>
+  <h1>A bar set in advance</h1>
+  <p class="byline">Owen Carlsen &middot; Nov 2026</p>
+<p>In June I left Apple after 7 years to work full time on <a href="https://www.ocarlsen.com/cdh.html">Claire Daily Health</a>, which began as a plan for a regulated telehealth brand. I started it to find out whether agents could run a company's day to day, the operations layer, and I thought a product would come out of building it. In November I closed it, the demand never showed. I had set the bar in advance, which made the call easier: a steady rate of waitlist sign-ups before I would order anything. I spent nothing on ads and never placed a production order.</p>
+
+<h2>Why I left</h2>
+
+<p>I loved working at Apple, and I wanted a new challenge. By the end of 2025 I was using agents every day, and I could see they would change how a company runs. I wanted to build that part myself and give it my best.</p>
+
+<p>I didn't line up another job first. I wanted experience as an "applied AI" engineer, even before I had heard that term, so I had to get it myself. I also wanted the experience of a first-time business owner. I admire people like my brother, who have started companies many times. Honestly, I wanted to own all the decisions, and I wanted to work with Claude full time, not around a day job.</p>
+
+<h2>A company built to be run by agents</h2>
+
+<p>That spring I kept seeing the word "solopreneur", and I thought that could be me. Then a newspaper ran a story about a founder who built a very large company with almost no staff and AI doing much of the work. I gave the article to Claude and asked how we would do it. It laid out a plan: form an LLC, register the domains and find partners for a telehealth brand.</p>
+
+<p>The more I learned, the less telehealth fit. It needed heavy compliance work, and a medical product used at home carries real risk for the company behind it. I really wanted to build the agent layer, so the business itself became secondary. Nothing had launched yet, so we changed it.</p>
+
+<p>My partner and I picked a simple consumer product I could make with one contract manufacturer and sell from the site, so the whole business could run through the system. We worked out what paid customer acquisition would cost, and set a bar: a steady rate of organic sign-ups before the production order.</p>
+
+<p>I built the system on my own time and my own machine. In July the site went live, the waitlist opened and the posting started. The website was only the storefront, and the real work ran behind it. I was the only engineer.</p>
+
+<h2>What actually ran</h2>
+
+<p>The system was 105 scheduled jobs on one machine, run by the operating system's scheduler. About half of them were canaries that checked the state the others left behind. 80 were plain Python that cost nothing to run, and the other 25 called a model, most of them only when they found new work.</p>
+
+<p>Together they triaged two mailboxes and all of Slack, drafted every vendor reply in my voice, answered the company phone line and ran our chat bot. They also checked invoices against the bank ledger, wrote my morning brief, drafted social posts, reviewed every pull request and made encrypted backups of the data layer.</p>
+
+<p>The email drafts stayed current because of a file I called the "live context", a short log of what just changed. Every session added a line when something changed and loaded the file at the start. Before a draft reached me, a script checked it against the log. If a draft said I was still waiting on a vendor and the log showed they had already replied, a canary sent me a Slack message to re-check it. The log kept only the latest 30 entries, so it stayed cheap to load.</p>
+
+<p>From the first day, anything a model wrote for email reached only me. Every external email was a draft that I sent. Social posts followed the same rule: models drafted the captions and images, and I picked, edited and approved every post. The few automatic sends went to a fixed recipient or used copy I wrote, with no model text in them.</p>
+
+<p>The phone and chat agents were the exception, because they spoke to callers and site visitors directly. The chat bot could be asked for medical advice, which it must never give, so most of my testing went there. Its eval harness had zero-tolerance gates for fabrication, medical boundaries, privacy and over-refusal, and one failed answer would block it from going public. I checked the judge itself against 99 hand-labeled answers, to make sure I could trust its grades. When it passed answers I would have failed, I traced why and fixed the grading.</p>
+
+<p>From late June to November the system logged about 12,000 model calls. The job and call tables are on <a href="https://www.ocarlsen.com/cdh.html">my CDH page</a>.</p>
+
+<h2>Where agents fail in production</h2>
+
+<p><strong>Sounding sure.</strong> An agent reported that a web page "didn't render" and filled its reply with search results instead. The page had loaded, but the agent had read only the first 150 lines, all navigation menu, and called it empty. The prompt already told it not to make that claim, so I changed the tool. The fetcher put the article first and printed its word count at the top, so even a short read got the content.</p>
+
+<p><strong>Looking green.</strong> A model release reached me before my own watcher flagged it, so I made the watcher hourly. The merge reported success, but the old daily schedule kept running. I counted how many other schedule changes had never installed: 58 of 64. My sync job compared the code before and after its own pull, but other jobs had already pulled, so it saw nothing new. The fix was to have the sync job remember the last commit it checked.</p>
+
+<p><strong>Quietly costing too much.</strong> My Slack agent's prompt had grown to 188 KB. Replies were spread across the day, so the cache had usually expired and every reply paid to load the whole thing. Most messages needed only the core rules, so I moved the rarely used sections into files the agent loaded on demand. The prompt dropped to 112 KB, and cost per reply fell by over a third.</p>
+
+<p><strong>Saved but never read.</strong> While doing a cost analysis, I found that my global memory, which loads in every session, held about 130 memories that belonged to one project, so every session paid to load them. Looking further, I found the reverse too: that project's own memory store had about 40 memories that never loaded at all, because nothing imported it. The fix was to move each project's memories into its own store, import each store from that project's instruction file, and add a canary that flags any store nothing loads.</p>
+
+<h2>The rules that came out of it</h2>
+
+<p><strong>Guards and canaries.</strong> A guard blocks a dangerous action before it runs: an unreviewed merge, discarding uncommitted work, a test touching live data. A canary checks for bad state afterward. One canary existed only to prove that a guard still fired, because a broken guard looks the same as one nothing tripped.</p>
+
+<p><strong>Fix the tool, not the prompt.</strong> Twice, the rule against a failure was already in the prompt when the failure happened. A rule in a prompt is a request the model may or may not follow, so the check goes in the tool.</p>
+
+<p><strong>Every change got a review, routed by content and size.</strong> Claude Sonnet built each change in its own workspace. A build is mostly mechanical work, so Sonnet did it, and Fable cost 12 to 14 times as much. Nothing merged without a review. A pipeline change of 80 lines or more could break production, so it went to Claude Fable, the strongest model I had and a different model from the one that built it. Fable got three in four reviews. Smaller changes and website changes went to Sonnet, and documentation-only changes went to Haiku, since a prose change can&rsquo;t carry a logic bug. Against reviewing everything on Fable, routing cut review spend by about a fifth.</p>
+
+<p><strong>Scheduled jobs start with almost nothing.</strong> At first every background job booted with the same 75,000 tokens of context as my interactive session, on every run. When I measured it, most jobs needed only a few hundred: what they do and where to look things up. So I ran six of the model jobs bare, with about 400 tokens of fixed context, and had them search memory only when they needed it. The job that acts on triaged mail dropped to about a quarter of its cost per thread.</p>
+
+<h2>What I'm taking with me</h2>
+
+<p>I'm taking the experience of building the agent layer, and the parts of it I've published. The company's own code stays private, because it holds customer and vendor data. I'm glad to walk through it on a call.</p>
+
+<p><strong><a href="https://github.com/ocarlsen/session-notes">session-notes</a></strong> is the session tooling I extracted from my own setup. <code>/reflect</code> saves what a session learned and where things stand to the project's memory, so tomorrow's session does not start cold, and a few tmux commands let me answer every session from one keyboard. I use it every day.</p>
+
+<p><strong><a href="https://github.com/ocarlsen/pinbench">pinbench</a></strong> is the model-upgrade process from my essay <a href="https://www.ocarlsen.com/model-upgrades.html">Upgrading production models without guessing</a>, as a command-line tool: pinned models, a hard cost cap, blind votes, and a stated rule for when to switch.</p>
+
+<p><strong><a href="https://ocarlsen.ai/frontdesk.html">FrontDesk</a></strong> is a new inbox agent, built from scratch on the same rules. It runs on my own computer, ranks what needs me and drafts replies. It sends nothing until I confirm the exact message, and I score each model on a labeled test set and a prompt-injection suite. I wrote up one real failure, a note it trusted that it should not have, in <a href="https://www.ocarlsen.com/memory-needs-an-author.html">Memory needs an author</a>.</p>
+
+<p>Next I want to run agents like these in production at a larger scale, with a team.</p>
+
+<p class="sources">Figures about my own system come from its scheduler, run logs, decision log and incident records, checked November 9, 2026. They are private, so they are not linked.</p>
+  <p class="written">How this was written: Claude drafted from my notes; I edited the draft and checked every claim against the code and logs.</p>
+  <footer>&copy; 2026 Owen Carlsen</footer>
+</main>
+</body>
+</html>

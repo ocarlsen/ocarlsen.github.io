@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Owen Carlsen</title>
+  <link href="https://www.ocarlsen.com/"/>
+  <link rel="self" href="https://www.ocarlsen.com/feed.xml"/>
+  <id>https://www.ocarlsen.com/</id>
+  <updated>2026-11-10T12:07:27-08:00</updated>
+  <author><name>Owen Carlsen</name></author>
+  <entry>
+    <title>A bar set in advance</title>
+    <link href="https://www.ocarlsen.com/a-bar-set-in-advance.html"/>
+    <id>https://www.ocarlsen.com/a-bar-set-in-advance.html</id>
+    <updated>2026-11-10T12:07:27-08:00</updated>
+    <summary>What over 100 scheduled jobs ran at Claire Daily Health, where the agents failed, the demand bar I set before the production order, and the code I am publishing.</summary>
+  </entry>
+  <entry>
+    <title>What I built at Claire Daily Health</title>
+    <link href="https://www.ocarlsen.com/cdh.html"/>
+    <id>https://www.ocarlsen.com/cdh.html</id>
+    <updated>2026-11-07T14:48:19-08:00</updated>
+    <summary>The LLM pipelines, agents, evals and model-upgrade process I built as founder and sole engineer of Claire Daily Health.</summary>
+  </entry>
+  <entry>
+    <title>Memory needs an author</title>
+    <link href="https://www.ocarlsen.com/memory-needs-an-author.html"/>
+    <id>https://www.ocarlsen.com/memory-needs-an-author.html</id>
+    <updated>2026-10-30T19:14:27-07:00</updated>
+    <summary>How my inbox agent came to quote a helper’s note back to me as my own, and the fix, tested on three vendors’ models.</summary>
+  </entry>
+  <entry>
+    <title>Upgrading production models without guessing</title>
+    <link href="https://www.ocarlsen.com/model-upgrades.html"/>
+    <id>https://www.ocarlsen.com/model-upgrades.html</id>
+    <updated>2026-10-18T17:41:11-07:00</updated>
+    <summary>How I pin, benchmark and blind-judge LLM upgrades in production, and what changed besides quality.</summary>
+  </entry>
+</feed>
