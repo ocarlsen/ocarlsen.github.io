@@ -75,14 +75,18 @@
 
 <h2>Agents and evals</h2>
 
-<p>I built the company's AI voice and chat agents and an eval harness for them. The harness held 131 probes in nine suites: 82 grounding questions generated from the company's own content, and hand-written suites for fabrication, medical boundaries, privacy wording, over-refusal, persona and conversation mechanics. An LLM judge scored each answer against the source text. Four suites were zero-tolerance gates, 29 probes in all, and one fail would block the agent from going public.</p>
+<p>I built the company's AI voice and chat agents and an eval harness for them. The harness held 131 probes in nine suites: 82 grounding questions generated from the company's own content, and hand-written suites for fabrication, medical boundaries, privacy wording, over-refusal, persona and conversation mechanics. An LLM judge read each answer against the source text and passed or failed it. Four suites were zero-tolerance gates, 29 probes in all, and one fail would block the agent from going public.</p>
 
-<p>I checked the judge against my own labels in eight rounds, 99 graded answers. It agreed with me on 93 percent, with three false passes and four false fails.</p>
+<p>The harness tested two things: the agent, and the judge that graded it.</p>
 
-<p>The harness recorded 452 results on the chat agent across 17 runs, from August 8 to September 21. The judge scored every zero-tolerance answer three times, so those 452 results took 1,166 judge calls. The judge's other 2,441 calls left no results: development runs, the eight calibration rounds, and two trials of newer judge models.</p>
+<p><strong>Testing the agent.</strong> An agent can answer a question well twice and badly once, so each zero-tolerance question ran as three separate conversations, and the judge scored each answer once. One bad answer out of three was enough to block the agent.</p>
+
+<p><strong>Testing the judge.</strong> The judge is a model too, so it can be wrong. I graded a sample of answers myself, without seeing its verdicts, and compared. The disagreements I traced came from the test, not the judge: a grading rule that was too loose or too strict, or the test API adding double spaces the live widget never shows. I fixed those, and in the last three rounds the judge agreed with me on every answer.</p>
+
+<p>The harness recorded 452 results on the chat agent across 17 runs. The zero-tolerance questions were asked three times, so those 452 results took 1,166 judge calls (the other 2,441 went to development runs, calibration and trials of newer judge models).</p>
 
 <div class="table-wrap"><table>
-<thead><tr><th>Suites</th><th>Results</th><th>Judged</th><th>Judge calls</th></tr></thead>
+<thead><tr><th>Suites</th><th>Results</th><th>Asked</th><th>Judge calls</th></tr></thead>
 <tbody>
 <tr><td>Grounding questions, one per entry in the site's glossary</td><td class="num">150</td><td>once</td><td class="num">150</td></tr>
 <tr><td>Brand voice, persona drift, conversation mechanics and answer depth</td><td class="num">35</td><td>once</td><td class="num">35</td></tr>
@@ -108,7 +112,7 @@
 
 <p>I ran many Claude Code sessions in parallel, one per project. The tooling that keeps their memory current across sessions, and lets me answer them all from one session, is open source as <a href="https://github.com/ocarlsen/session-notes">session-notes</a>.</p>
 
-<p>The company&rsquo;s code is private, because it holds customer and vendor data. I&rsquo;m glad to walk through it on a call.</p>
+<p>The company&rsquo;s code is private, because it holds customer and vendor data. I&rsquo;m glad to walk through it on a call. To see the sessions at work, the <a href="https://github.com/ocarlsen/session-notes">session-notes</a> README has a film of about five minutes of real Claude Code sessions.</p>
   <p class="written">How this was written: Claude drafted from my notes; I edited the draft and checked every claim against the code and logs.</p>
   <footer>&copy; 2026 Owen Carlsen</footer>
 </main>
