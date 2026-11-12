@@ -102,7 +102,7 @@
 
 <h2>Cost and memory</h2>
 
-<p>The Slack agent's prompt had grown to about 190 KB, and most of each reply's cost was writing it to the cache. I split it into a short router and 20 lane files, one per command, that the agent read only when a message hit that lane. Over the two weeks on each side of the change, the cache write per reply fell from about 88,000 tokens to about 66,000, and the cost per reply fell by over a third.</p>
+<p>Prompt caching drove most of the Slack agent's cost. Its prompt had grown to about 190 KB, and most of each reply's cost was writing it to the cache. I split it into a short router and 20 lane files, one per command, that the agent read only when a message hit that lane. Over the two weeks on each side of the change, the cache write per reply fell from about 88,000 tokens to about 66,000, and the cost per reply fell by over a third. I kept prompt caching on for multi-turn jobs, which re-read their prompt every turn, and turned it off for single-turn reviews, after measuring that a prompt read once only paid the cache-write premium.</p>
 
 <p>PR review routed each diff by size. Fable reviewed every pipeline diff of 80 lines or more, which was three in four reviews. Smaller diffs and website changes went to Sonnet, and documentation-only diffs went to Haiku. Fable cost 12 to 14 times as much as Sonnet per review.</p>
 
