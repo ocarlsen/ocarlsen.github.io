@@ -79,11 +79,62 @@
 </table>
 </div>
 
-<p>Running each model twice shows how much a score moves on its own: 5.2 found the same number of blocking bugs both times, and 5.1 found three more the second time. With only 124 bugs, the gap between the two models has a wide margin of error. To size it, I used a bootstrap: 4,000 pretend versions of the test, built by drawing tickets at random from the real ones. In 95% of them, the second run's gap fell between about 3 fewer bugs and about 19 more.</p>
+<p>Running each model twice shows how much a score moves on its own: 5.2 found the same number of blocking bugs both times, and 5.1 found three more the second time.</p>
 
-<p>5.2 writes a little more per review, thinking included, but it costs less per token. I read a sample of the reviews where the two models disagreed. Most of the judge's calls were right, and the wrong ones were too strict on 5.2. Two of the 328 judge replies failed to parse, both on 5.2's side, and they count as misses. The whole run, both models twice plus the judge, cost about $158 at batch price.</p>
+<p>With only 124 bugs, the gap between the two models has a wide margin of error. To size it, I used a bootstrap: 4,000 pretend versions of the test, built by drawing tickets at random from the real ones. In 95% of them, the range was +2 to +20 in the first run, and &minus;3 to +19 in the second. So the second run's range includes zero: on that run alone, a tie can't be ruled out.</p>
 
-<p>Here is where the lower cost comes from. Each review read the same input on both models, so the difference is in what they wrote back and what each token costs:</p>
+<figure class="errorbars">
+<svg viewBox="0 0 640 170" role="img" aria-label="Fable 5.2 minus Fable 5.1, blocking bugs found, with 95% bootstrap ranges. Run 1: +11, range +2 to +20. Run 2: +8, range -3 to +19.">
+  <style>
+    .errorbars svg { width: 100%; height: auto; display: block; }
+    .eb-axis { stroke: var(--rule); stroke-width: 1; }
+    .eb-zero { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3; }
+    .eb-whisker { stroke: var(--accent); stroke-width: 2; stroke-linecap: round; }
+    .eb-dot { fill: var(--accent); stroke: var(--bg); stroke-width: 2; }
+    .eb-label, .eb-value { fill: var(--ink); font-size: 14px; }
+    .eb-value { font-weight: 600; }
+    .eb-end, .eb-tick, .eb-note { fill: var(--muted); font-size: 12px; }
+    .eb-row:hover .eb-whisker, .eb-row:focus .eb-whisker { stroke-width: 3; }
+  </style>
+  <line x1="120.0" y1="115" x2="600.0" y2="115" class="eb-axis"/>
+  <line x1="120.0" y1="115" x2="120.0" y2="120" class="eb-axis"/><text x="120.0" y="134" text-anchor="middle" class="eb-tick">&minus;5</text>
+  <line x1="208.9" y1="115" x2="208.9" y2="120" class="eb-axis"/><text x="208.9" y="134" text-anchor="middle" class="eb-tick">0</text>
+  <line x1="297.8" y1="115" x2="297.8" y2="120" class="eb-axis"/><text x="297.8" y="134" text-anchor="middle" class="eb-tick">+5</text>
+  <line x1="386.7" y1="115" x2="386.7" y2="120" class="eb-axis"/><text x="386.7" y="134" text-anchor="middle" class="eb-tick">+10</text>
+  <line x1="475.6" y1="115" x2="475.6" y2="120" class="eb-axis"/><text x="475.6" y="134" text-anchor="middle" class="eb-tick">+15</text>
+  <line x1="564.4" y1="115" x2="564.4" y2="120" class="eb-axis"/><text x="564.4" y="134" text-anchor="middle" class="eb-tick">+20</text>
+  <line x1="208.9" y1="18" x2="208.9" y2="115" class="eb-zero"/>
+  <text x="213.9" y="14" class="eb-note">no difference</text>
+  <g class="eb-row" tabindex="0"><title>Run 1: 5.2 found +11 blocking bugs vs 5.1 (95% range +2 to +20)</title>
+    <rect x="120.0" y="24" width="480.0" height="32" fill="transparent"/>
+    <text x="110" y="45" text-anchor="end" class="eb-label">Run 1</text>
+    <line x1="244.4" y1="40" x2="564.4" y2="40" class="eb-whisker"/>
+    <line x1="244.4" y1="33" x2="244.4" y2="47" class="eb-whisker"/>
+    <line x1="564.4" y1="33" x2="564.4" y2="47" class="eb-whisker"/>
+    <circle cx="404.4" cy="40" r="6" class="eb-dot"/>
+    <text x="404.4" y="27" text-anchor="middle" class="eb-value">+11</text>
+    <text x="236.4" y="45" text-anchor="end" class="eb-end">+2</text>
+    <text x="572.4" y="45" text-anchor="start" class="eb-end">+20</text>
+  </g>
+  <g class="eb-row" tabindex="0"><title>Run 2: 5.2 found +8 blocking bugs vs 5.1 (95% range -3 to +19)</title>
+    <rect x="120.0" y="69" width="480.0" height="32" fill="transparent"/>
+    <text x="110" y="90" text-anchor="end" class="eb-label">Run 2</text>
+    <line x1="155.6" y1="85" x2="546.7" y2="85" class="eb-whisker"/>
+    <line x1="155.6" y1="78" x2="155.6" y2="92" class="eb-whisker"/>
+    <line x1="546.7" y1="78" x2="546.7" y2="92" class="eb-whisker"/>
+    <circle cx="351.1" cy="85" r="6" class="eb-dot"/>
+    <text x="351.1" y="72" text-anchor="middle" class="eb-value">+8</text>
+    <text x="147.6" y="90" text-anchor="end" class="eb-end">&minus;3</text>
+    <text x="554.7" y="90" text-anchor="start" class="eb-end">+19</text>
+  </g>
+  <text x="360.0" y="160" text-anchor="middle" class="eb-note">Fable 5.2 minus Fable 5.1, blocking bugs found</text>
+</svg>
+<figcaption>Dots are the measured gap; lines are the range that held in 95% of 4,000 resampled versions of the test.</figcaption>
+</figure>
+
+<p>I read a sample of the reviews where the two models disagreed. 5.2's real results are, if anything, a little stronger than the numbers above: twice the judge marked a bug as missed that 5.2's review had in fact named, and the two judge replies that failed to parse were both on 5.2's reviews.</p>
+
+<p>The table also shows 5.2 was cheaper per review. Here is where that comes from. Each review read the same input on both models, so the difference is in what they wrote back and what each token costs:</p>
 
 <div class="table-wrap">
 <table class="num">
@@ -95,7 +146,7 @@
 </table>
 </div>
 
-<p>Input is a little over half of the bill, because every review reads about 46,000 tokens of diff and files, and the lower price applies to all of it. That is why 9% more output still came out cheaper.</p>
+<p>Input is a little over half of the bill, because every review reads about 46,000 tokens of diff and files, and the lower price applies to all of it. That is why 9% more output still came out cheaper. The whole run, both models twice plus the judge, cost about $158 at batch price.</p>
 
 <p>The lower cost depends on the effort setting, though. At its default effort (high), on the earlier twelve-item run, 5.2 wrote about 70% more than 5.1. The break-even here is about 60% more, so at its default effort 5.2 would likely cost more per review. (I didn't measure whether that extra thinking finds more bugs.)</p>
 
