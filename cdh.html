@@ -75,7 +75,7 @@
 
 <h2>Agents and evals</h2>
 
-<p>I built the company's AI voice and chat agents and an eval harness for them. The harness held 131 probes in nine suites: 82 grounding questions generated from the company's own content, and hand-written suites for fabrication, medical boundaries, privacy wording, over-refusal, persona and conversation mechanics. An LLM judge read each answer against the source text and passed or failed it. Four suites were zero-tolerance gates, 29 probes in all, and one fail would block the agent from going public.</p>
+<p>I built the company's AI voice and chat agents and an eval harness for them. The chat agent answered from a knowledge base built from the company's own web pages, retrieved for each question (RAG), and every eval run first checked in code that retrieval was on and the index was built. The harness held 131 probes in nine suites: 82 grounding questions generated from the company's own content, and hand-written suites for fabrication, medical boundaries, privacy wording, over-refusal, persona and conversation mechanics. An LLM judge read each answer against the source text and passed or failed it. Four suites were zero-tolerance gates, 29 probes in all, and one fail would block the agent from going public.</p>
 
 <p>The harness tested two things: the agent, and the judge that graded it.</p>
 
