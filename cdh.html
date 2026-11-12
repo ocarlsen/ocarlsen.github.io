@@ -71,11 +71,11 @@
 
 <h2>Alerts</h2>
 
-<p>The canaries and the reports posted 596 alerts of 85 kinds to Slack between late June and November. 71 percent got an automatic follow-up: a worker read the logs behind the alert and posted a recommended fix in the alert's thread, with a one-tap approval to run it.</p>
+<p>The canaries and the reports posted 596 alerts of 85 kinds to Slack between late June and November. 71 percent got an automatic follow-up: a worker read the logs behind the alert and posted a recommended fix in the alert's thread, with a one-tap approval to run it. Every consequential action worked that way, human in the loop: data deletions, model switches and eval runs waited on my tap, and code, not a model, ran the action I had approved.</p>
 
 <h2>Agents and evals</h2>
 
-<p>I built the company's AI voice and chat agents and an eval harness for them. The chat agent answered from a knowledge base built from the company's own web pages, retrieved for each question (RAG), and every eval run first checked in code that retrieval was on and the index was built. The harness held 131 probes in nine suites: 82 grounding questions generated from the company's own content, and hand-written suites for fabrication, medical boundaries, privacy wording, over-refusal, persona and conversation mechanics. An LLM judge read each answer against the source text and passed or failed it. Four suites were zero-tolerance gates, 29 probes in all, and one fail would block the agent from going public.</p>
+<p>I built the company's AI voice and chat agents and an eval harness for them. The chat agent answered from a knowledge base built from the company's own web pages, retrieved for each question (RAG), and every eval run first checked in code that retrieval was on and the index was built. The harness held 131 probes in nine suites: 82 grounding questions generated from the company's own content, and hand-written suites for fabrication, medical boundaries, privacy wording, over-refusal, persona and conversation mechanics. An LLM judge (LLM-as-a-judge) read each answer against the source text and returned its pass or fail as JSON in a fixed schema (structured outputs). Four suites were zero-tolerance gates, 29 probes in all, and one fail would block the agent from going public.</p>
 
 <p>The harness tested two things: the agent, and the judge that graded it.</p>
 
@@ -105,6 +105,8 @@
 <p>The Slack agent's prompt had grown to about 190 KB, and most of each reply's cost was writing it to the cache. I split it into a short router and 20 lane files, one per command, that the agent read only when a message hit that lane. Over the two weeks on each side of the change, the cache write per reply fell from about 88,000 tokens to about 66,000, and the cost per reply fell by over a third.</p>
 
 <p>PR review routed each diff by size. Fable reviewed every pipeline diff of 80 lines or more, which was three in four reviews. Smaller diffs and website changes went to Sonnet, and documentation-only diffs went to Haiku. Fable cost 12 to 14 times as much as Sonnet per review.</p>
+
+<p>Every model call, from a scheduled job or a direct API call, was logged with its job, model, tokens and cost, which fed a daily cost report and a spend cap on the second-model checks. Generated social images and video clips went to a vision model before I saw them, which gave each image a provisional verdict and flagged clips with a known rendering defect.</p>
 
 <p>Memory lived in 12 stores, one per project, 727 files in all, each loaded only by the sessions that worked in that project. A daily check would flag any store that nothing loaded, any file that would blow the boot budget, and any store missing from the backup.</p>
 
