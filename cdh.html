@@ -106,7 +106,7 @@
 
 <p>PR review routed each diff by size. Fable reviewed every pipeline diff of 80 lines or more, which was three in four reviews. Smaller diffs and website changes went to Sonnet, and documentation-only diffs went to Haiku. Fable cost 12 to 14 times as much as Sonnet per review.</p>
 
-<p>Every model call, from a scheduled job or a direct API call, was logged with its job, model, tokens and cost, which fed a daily cost report and a spend cap on the second-model checks. Generated social images and video clips went to a vision model before I saw them, which gave each image a provisional verdict and flagged clips with a known rendering defect.</p>
+<p>Every model call, from a scheduled job or a direct API call, was logged with its job, model, tokens and cost, which fed a daily cost report and a monthly spend cap on the second-model checks. Generated social images and video clips went to a vision model before I saw them, which gave each image a provisional verdict and flagged clips with a known rendering defect.</p>
 
 <p>Memory lived in 12 stores, one per project, 727 files in all, each loaded only by the sessions that worked in that project. A daily check would flag any store that nothing loaded, any file that would blow the boot budget, and any store missing from the backup.</p>
 
