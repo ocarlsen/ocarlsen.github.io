@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>My code reviewer was on an alias | Owen Carlsen</title>
+<title>Fable 5.2 vs 5.1 on 124 bugs from my own pull requests | Owen Carlsen</title>
 <meta name="description" content="Fable 5.2 against 5.1 on 124 real blocking bugs from my own PRs: what each caught, what it cost per bug, and the alias that would have switched my reviewer without telling me.">
-<meta property="og:title" content="My code reviewer was on an alias">
+<meta property="og:title" content="Fable 5.2 vs 5.1 on 124 bugs from my own pull requests">
 <meta property="og:description" content="Fable 5.2 against 5.1 on 124 real blocking bugs from my own PRs: what each caught, what it cost per bug, and the alias that would have switched my reviewer without telling me.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://www.ocarlsen.com/fable-52-reviews.html">
@@ -19,7 +19,7 @@
 <body>
 <main class="post">
   <p class="back"><a href="index.html">&larr; Owen Carlsen</a></p>
-  <h1>My code reviewer was on an alias</h1>
+  <h1>Fable 5.2 vs 5.1 on 124 bugs from my own pull requests</h1>
   <p class="byline">Owen Carlsen &middot; Nov 2026</p>
 <p>Anthropic released Claude Fable 5.2 on November 9. Fable reviews my pull requests (PRs), as a Claude Code subagent, so the first thing I wanted to know was whether to switch. Then I found that I had never pinned the reviewer's model. The reviews ran through Claude Code's <code>fable</code> alias. On the version I had, that alias resolved to Fable 5.1. The changelog for the release that adds 5.2 says the alias moves to 5.2. My reviewer would have changed on release day and nothing in my repo would have said so.</p>
 
