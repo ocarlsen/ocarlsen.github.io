@@ -107,8 +107,9 @@ main.post .dek { color: var(--muted); font-size: 1.05rem; }
 main.post figure { margin: 24px 0; }
 main.post figure img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 10px; }
 main.post figcaption { color: var(--muted); font-size: 0.88rem; line-height: 1.5; margin-top: 8px; }
-main.post .table-wrap { overflow-x: auto; margin: 12px 0 16px; }
+main.post .table-wrap { overflow-x: auto; margin: 12px 0 1.25em; }
 main.post table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+main.post table.num td + td, main.post table.num th + th { white-space: nowrap; }
 main.post th, main.post td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
 main.post th { color: var(--muted); font-weight: 600; }
 main.post td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }

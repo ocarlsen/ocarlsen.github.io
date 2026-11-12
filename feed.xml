@@ -4,8 +4,15 @@
   <link href="https://www.ocarlsen.com/"/>
   <link rel="self" href="https://www.ocarlsen.com/feed.xml"/>
   <id>https://www.ocarlsen.com/</id>
-  <updated>2026-11-10T12:07:27-08:00</updated>
+  <updated>2026-11-11T15:00:00-08:00</updated>
   <author><name>Owen Carlsen</name></author>
+  <entry>
+    <title>My code reviewer was on an alias</title>
+    <link href="https://www.ocarlsen.com/fable-52-reviews.html"/>
+    <id>https://www.ocarlsen.com/fable-52-reviews.html</id>
+    <updated>2026-11-11T15:00:00-08:00</updated>
+    <summary>Fable 5.2 against 5.1 on 124 real blocking bugs from my own PRs: what each caught, what it cost per bug, and the alias that would have switched my reviewer without telling me.</summary>
+  </entry>
   <entry>
     <title>A bar set in advance</title>
     <link href="https://www.ocarlsen.com/a-bar-set-in-advance.html"/>

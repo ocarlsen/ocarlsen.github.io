@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My code reviewer was on an alias | Owen Carlsen</title>
+<meta name="description" content="Fable 5.2 against 5.1 on 124 real blocking bugs from my own PRs: what each caught, what it cost per bug, and the alias that would have switched my reviewer without telling me.">
+<meta property="og:title" content="My code reviewer was on an alias">
+<meta property="og:description" content="Fable 5.2 against 5.1 on 124 real blocking bugs from my own PRs: what each caught, what it cost per bug, and the alias that would have switched my reviewer without telling me.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.ocarlsen.com/fable-52-reviews.html">
+<meta property="og:image" content="https://www.ocarlsen.com/owen.jpg">
+<link rel="canonical" href="https://www.ocarlsen.com/fable-52-reviews.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+<link rel="stylesheet" href="site.css">
+<link rel="alternate" type="application/atom+xml" title="Owen Carlsen" href="feed.xml">
+</head>
+<body>
+<main class="post">
+  <p class="back"><a href="index.html">&larr; Owen Carlsen</a></p>
+  <h1>My code reviewer was on an alias</h1>
+  <p class="byline">Owen Carlsen &middot; Nov 2026</p>
+<p>Anthropic released Claude Fable 5.2 on November 9. Fable reviews my pull requests (PRs), as a Claude Code subagent, so the first thing I wanted to know was whether to switch. Then I found that I had never pinned the reviewer's model. The reviews ran through Claude Code's <code>fable</code> alias. On the version I had, that alias resolved to Fable 5.1. The changelog for the release that adds 5.2 says the alias moves to 5.2. My reviewer would have changed on release day and nothing in my repo would have said so.</p>
+
+<p>That is the exact failure I built <a href="https://github.com/ocarlsen/pinbench">pinbench</a> to prevent. Pinbench is a command-line tool that compares two pinned models on my own tasks, and I wrote about pinning in <a href="https://www.ocarlsen.com/model-upgrades.html">Upgrading production models without guessing</a>. So I pinned the alias to 5.1 before updating, with one setting: <code>ANTHROPIC_DEFAULT_FABLE_MODEL=claude-fable-5-1</code>. Then I measured the two models the way pinbench always does: through the Claude API, each model ID pinned, at the effort my reviews already ran at.</p>
+
+<h2>The first test was the wrong test</h2>
+
+<p>The quick answer came from pinbench's summary suite: ten short passages, a judge from another vendor, three key facts per passage.</p>
+
+<div class="table-wrap">
+<table class="num">
+<tr><th>Summary suite, 10 passages</th><th>Fable 5.1</th><th>Fable 5.2</th><th>Result</th></tr>
+<tr><td>Key facts found, of 30</td><td>29</td><td>29</td><td>Same</td></tr>
+<tr><td>Claims the passage doesn't support</td><td>0</td><td>0</td><td>Same</td></tr>
+<tr><td>Cost per passage, list price</td><td>$0.011</td><td>$0.010</td><td>5.2 is 12% cheaper</td></tr>
+<tr><td>The one passage with an arithmetic error</td><td>Repeated it</td><td>Flagged it</td><td>5.2 caught it</td></tr>
+</table>
+</div>
+
+<p>Pinbench's verdict was RECOMMEND, meaning switch, but only for <i>summaries</i>. It says nothing about <i>code reviews</i>.</p>
+
+<p>The review suite that ships with pinbench is six tiny diffs with one planted bug each, and tiny diffs never go to Fable in my workflow. Fable gets the PRs that touch several files and a few hundred lines, so I needed a test made up of those.</p>
+
+<h2>An answer key made of fixes</h2>
+
+<p>I ran a one-person company, now closed, whose operations ran on <a href="https://www.ocarlsen.com/cdh.html">about a hundred scheduled jobs</a>. Most of that code was written by AI agents, and PRs were reviewed by a model before they merged. A PR could be reviewed more than once, and each review was a round. When the reviewer found something, the agent that requested the review fixed it in a commit of its own, with a message like "review round 1: ..." naming what it fixed.</p>
+
+<p>I used those commits as the answer key. For each one, I rebuilt the diff the reviewer saw just before the fix. A model then wrote down each defect the fix corrected, as a description of what was wrong in the code. On the PRs I tested, that came to 209 total defects, which I bucketed into <i>blocking</i> and <i>non-blocking</i>.</p>
+
+<p>A blocking bug is one that should stop a merge: wrong behavior on a realistic input, lost data, a message sent that shouldn't have been, or a safety check that lets things through when it should block them. The rest are smaller defects like a stale comment or a missing test. The headline score uses the blocking bugs that are visible in what the reviewer was given, without running any code, of which there were 124.</p>
+
+<p>Each model got what the reviewer had at the time: the diff, the full text of the changed files, and the ticket when there was one. It got nothing written after the review. Claude Opus 5.5 graded every review blind against the answer key, one review at a time. A review got credit for a defect only if it pointed to the same place in the code, and described the same wrong behavior, as the answer key. I used the same judge, with the same instructions, for every review.</p>
+
+<h2>What the live runs caught</h2>
+
+<p>I first ran a smaller, twelve-item version of this test, and it found four problems. I fixed each one before the full run:</p>
+<ol>
+<li>Thinking used up the output budget. Both models think before they answer, and at the default effort (high), several reviews spent the whole 16,000-token ceiling thinking and returned nothing. Pinbench refused to score them instead of counting them as misses. The full run uses a higher ceiling and <i>medium</i> effort.</li>
+<li>Each call took from 1-4 minutes, but pinbench had a fixed 60-second timeout (now configurable, <a href="https://github.com/ocarlsen/pinbench/issues/8">issue #8</a>). So, for the full run, I added <a href="https://platform.claude.com/docs/en/build-with-claude/batch-processing">Batch API</a> support to pinbench. A batch has no per-call timeout, and it costs half as much.</li>
+<li>The prompts I had first used gave away some of the answers. The review requests written at the time named what to look for, and more than half of the defects were hinted at this way. The final suite uses one neutral prompt.</li>
+<li>Each model got the PR's diff plus the full text of some files. At first, the only files shown in full were the ones the fix changed: the buggy ones, in other words. That told the model where to look. Claude Opus 5.5 caught this in a design review. The final version shows the full text of every file the PR changed, the same files a reviewer would open, chosen without looking at the fix.</li>
+</ol>
+
+<h2>Results</h2>
+
+<p>Both models ran at medium effort (the API's <code>effort</code> setting), the level all my past reviews used. I ran each model twice, to see how much a score changes between two runs of the same model.</p>
+
+<div class="table-wrap">
+<table class="num">
+<tr><th></th><th>Fable 5.1</th><th>Fable 5.2</th><th>5.2 vs 5.1</th></tr>
+<tr><td>Blocking bugs found, of 124 (run 1 / run 2)</td><td>94 / 97 (77%)</td><td>105 / 105 (85%)</td><td>+11 / +8</td></tr>
+<tr><td>All defects found, of 209</td><td>130 / 132</td><td>151 / 151</td><td>+21 / +19</td></tr>
+<tr><td>Claims the judge marked unsupported, per review</td><td>0.85 / 0.99</td><td>0.37 / 0.39</td><td>&minus;0.48 / &minus;0.60</td></tr>
+<tr><td>Cost per review, batch price</td><td>$0.41</td><td>$0.34</td><td>&minus;$0.07</td></tr>
+<tr><td>Cost per blocking bug found</td><td>$0.35</td><td>$0.27</td><td>&minus;$0.08</td></tr>
+<tr><td>Output tokens per review, thinking included</td><td>about 7,100</td><td>about 7,800</td><td>about +700</td></tr>
+</table>
+</div>
+
+<p>Running each model twice shows how much a score moves on its own: 5.2 found the same number of blocking bugs both times, and 5.1 found three more the second time. With only 124 bugs, the gap between the two models has a wide margin of error. To size it, I used a bootstrap: 4,000 pretend versions of the test, built by drawing tickets at random from the real ones. In 95% of them, the second run's gap fell between about 3 fewer bugs and about 19 more.</p>
+
+<p>5.2 writes a little more per review, thinking included, but it costs less per token. I read a sample of the reviews where the two models disagreed. Most of the judge's calls were right, and the wrong ones were too strict on 5.2. Two of the 328 judge replies failed to parse, both on 5.2's side, and they count as misses. The whole run, both models twice plus the judge, cost about $158 at batch price.</p>
+
+<p>Here is where the lower cost comes from. Each review read the same input on both models, so the difference is in what they wrote back and what each token costs:</p>
+
+<div class="table-wrap">
+<table class="num">
+<tr><th>Per review, average of both runs</th><th>Fable 5.1</th><th>Fable 5.2</th><th>Result</th></tr>
+<tr><td>Input tokens</td><td>46,458</td><td>46,458</td><td>Same</td></tr>
+<tr><td>Output tokens, thinking included</td><td>about 7,100</td><td>about 7,800</td><td>5.2 writes about 9% more</td></tr>
+<tr><td>List price per million tokens, in / out</td><td>$10 / $50</td><td>$8 / $40</td><td>5.2 is 20% lower</td></tr>
+<tr><td>Cost per review, batch price</td><td>$0.41</td><td>$0.34</td><td>5.2 is 17% cheaper</td></tr>
+</table>
+</div>
+
+<p>Input is a little over half of the bill, because every review reads about 46,000 tokens of diff and files, and the lower price applies to all of it. That is why 9% more output still came out cheaper.</p>
+
+<p>The lower cost depends on the effort setting, though. At its default effort (high), on the earlier twelve-item run, 5.2 wrote about 70% more than 5.1. The break-even here is about 60% more, so at its default effort 5.2 would likely cost more per review. (I didn't measure whether that extra thinking finds more bugs.)</p>
+
+<h2>Caveats</h2>
+
+<ul>
+<li>The answer key leans toward 5.1, because 5.1 did many of the original reviews. If it missed a bug, nobody fixed it, so the bug isn't in the key and 5.2 gets no credit for finding it.</li>
+<li>Each review was one prompt with no tools, so this measures reading a diff. In a real review, the model also reads the repository and runs tests.</li>
+<li>It is one codebase, mostly written by AI agents.</li>
+<li>I tested two days after release, at one effort setting.</li>
+</ul>
+
+<p>It was enough for my own reviews, so I moved the pin with the same setting: <code>ANTHROPIC_DEFAULT_FABLE_MODEL=claude-fable-5-2</code>. I also kept <code>CLAUDE_CODE_SUBAGENT_EFFORT=medium</code>, so my reviews run at the effort I measured and not at 5.2's default (high).</p>
+    <p class="cta"><a href="https://www.linkedin.com/in/ocarlsen">Get in touch on LinkedIn</a></p>
+  <p class="written">How this was written: Claude drafted from my notes; I edited the draft and checked every claim against the code and logs.</p>
+  <footer>&copy; 2026 Owen Carlsen</footer>
+</main>
+</body>
+</html>
