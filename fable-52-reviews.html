@@ -73,21 +73,21 @@
 <div class="table-wrap">
 <table class="num">
 <tr><th></th><th>Fable 5.1</th><th>Fable 5.2</th><th>5.2 vs 5.1</th></tr>
-<tr><td>Blocking bugs found, of 124 (run 1 / run 2)</td><td>94 / 97 (77%)</td><td>105 / 105 (85%)</td><td>+11 / +8</td></tr>
-<tr><td>All defects found, of 209</td><td>130 / 132</td><td>151 / 151</td><td>+21 / +19</td></tr>
-<tr><td>Claims the judge marked unsupported, per review</td><td>0.85 / 0.99</td><td>0.37 / 0.39</td><td>&minus;0.48 / &minus;0.60</td></tr>
-<tr><td>Cost per review, batch price</td><td>$0.41</td><td>$0.34</td><td>&minus;$0.07</td></tr>
-<tr><td>Cost per blocking bug found</td><td>$0.35</td><td>$0.27</td><td>&minus;$0.08</td></tr>
-<tr><td>Output tokens per review, thinking included</td><td>about 7,100</td><td>about 7,800</td><td>about +700</td></tr>
+<tr><td>Blocking bugs found, of 124 (run 1 / run 2)</td><td>98 / 98 (79%)</td><td>108 / 110 (88%)</td><td>+10 / +12</td></tr>
+<tr><td>All defects found, of 209</td><td>138 / 134</td><td>155 / 155</td><td>+17 / +21</td></tr>
+<tr><td>Claims the judge marked unsupported, per review</td><td>1.02 / 0.93</td><td>0.40 / 0.37</td><td>&minus;0.62 / &minus;0.56</td></tr>
+<tr><td>Cost per review, batch price</td><td>$0.42</td><td>$0.35</td><td>&minus;$0.07</td></tr>
+<tr><td>Cost per blocking bug found</td><td>$0.35</td><td>$0.26</td><td>&minus;$0.09</td></tr>
+<tr><td>Output tokens per review, thinking included</td><td>about 7,400</td><td>about 7,900</td><td>about +500</td></tr>
 </table>
 </div>
 
-<p>Running each model twice shows how much a score moves on its own: 5.2 found the same number of blocking bugs both times, and 5.1 found three more the second time.</p>
+<p>Running each model twice shows how much a score moves on its own: 5.1 found the same number of blocking bugs both times, and 5.2 found two more the second time.</p>
 
-<p>With only 124 bugs, the gap between the two models has a wide margin of error. To size it, I used a bootstrap: 4,000 pretend versions of the test, built by drawing tickets at random from the real ones. In 95% of them, the range was +2 to +20 in the first run, and &minus;3 to +19 in the second. So the second run's range includes zero: on that run alone, a tie can't be ruled out.</p>
+<p>With only 124 bugs, the gap between the two models has a wide margin of error. To size it, I used a bootstrap: 4,000 pretend versions of the test, built by drawing tickets at random from the real ones. In 95% of them, the range was +2 to +19 in the first run, and +4 to +20 in the second. Neither range includes zero.</p>
 
 <figure class="errorbars">
-<svg viewBox="0 0 640 170" role="img" aria-label="Fable 5.2 minus Fable 5.1, blocking bugs found, with 95% bootstrap ranges. Run 1: +11, range +2 to +20. Run 2: +8, range -3 to +19.">
+<svg viewBox="0 0 640 170" role="img" aria-label="Fable 5.2 minus Fable 5.1, blocking bugs found, with 95% bootstrap ranges. Run 1: +10, range +2 to +19. Run 2: +12, range +4 to +20.">
   <style>
     .errorbars svg { width: 100%; height: auto; display: block; }
     .eb-axis { stroke: var(--rule); stroke-width: 1; }
@@ -108,48 +108,48 @@
   <line x1="564.4" y1="115" x2="564.4" y2="120" class="eb-axis"/><text x="564.4" y="134" text-anchor="middle" class="eb-tick">+20</text>
   <line x1="208.9" y1="18" x2="208.9" y2="115" class="eb-zero"/>
   <text x="213.9" y="14" class="eb-note">no difference</text>
-  <g class="eb-row" tabindex="0"><title>Run 1: 5.2 found +11 blocking bugs vs 5.1 (95% range +2 to +20)</title>
+  <g class="eb-row" tabindex="0"><title>Run 1: 5.2 found +10 blocking bugs vs 5.1 (95% range +2 to +19)</title>
     <rect x="120.0" y="24" width="480.0" height="32" fill="transparent"/>
     <text x="110" y="45" text-anchor="end" class="eb-label">Run 1</text>
-    <line x1="244.4" y1="40" x2="564.4" y2="40" class="eb-whisker"/>
+    <line x1="244.4" y1="40" x2="546.7" y2="40" class="eb-whisker"/>
     <line x1="244.4" y1="33" x2="244.4" y2="47" class="eb-whisker"/>
-    <line x1="564.4" y1="33" x2="564.4" y2="47" class="eb-whisker"/>
-    <circle cx="404.4" cy="40" r="6" class="eb-dot"/>
-    <text x="404.4" y="27" text-anchor="middle" class="eb-value">+11</text>
+    <line x1="546.7" y1="33" x2="546.7" y2="47" class="eb-whisker"/>
+    <circle cx="386.7" cy="40" r="6" class="eb-dot"/>
+    <text x="386.7" y="27" text-anchor="middle" class="eb-value">+10</text>
     <text x="236.4" y="45" text-anchor="end" class="eb-end">+2</text>
-    <text x="572.4" y="45" text-anchor="start" class="eb-end">+20</text>
+    <text x="554.7" y="45" text-anchor="start" class="eb-end">+19</text>
   </g>
-  <g class="eb-row" tabindex="0"><title>Run 2: 5.2 found +8 blocking bugs vs 5.1 (95% range -3 to +19)</title>
+  <g class="eb-row" tabindex="0"><title>Run 2: 5.2 found +12 blocking bugs vs 5.1 (95% range +4 to +20)</title>
     <rect x="120.0" y="69" width="480.0" height="32" fill="transparent"/>
     <text x="110" y="90" text-anchor="end" class="eb-label">Run 2</text>
-    <line x1="155.6" y1="85" x2="546.7" y2="85" class="eb-whisker"/>
-    <line x1="155.6" y1="78" x2="155.6" y2="92" class="eb-whisker"/>
-    <line x1="546.7" y1="78" x2="546.7" y2="92" class="eb-whisker"/>
-    <circle cx="351.1" cy="85" r="6" class="eb-dot"/>
-    <text x="351.1" y="72" text-anchor="middle" class="eb-value">+8</text>
-    <text x="147.6" y="90" text-anchor="end" class="eb-end">&minus;3</text>
-    <text x="554.7" y="90" text-anchor="start" class="eb-end">+19</text>
+    <line x1="280.0" y1="85" x2="564.4" y2="85" class="eb-whisker"/>
+    <line x1="280.0" y1="78" x2="280.0" y2="92" class="eb-whisker"/>
+    <line x1="564.4" y1="78" x2="564.4" y2="92" class="eb-whisker"/>
+    <circle cx="422.2" cy="85" r="6" class="eb-dot"/>
+    <text x="422.2" y="72" text-anchor="middle" class="eb-value">+12</text>
+    <text x="272.0" y="90" text-anchor="end" class="eb-end">+4</text>
+    <text x="572.4" y="90" text-anchor="start" class="eb-end">+20</text>
   </g>
   <text x="360.0" y="160" text-anchor="middle" class="eb-note">Fable 5.2 minus Fable 5.1, blocking bugs found</text>
 </svg>
 <figcaption>Dots are the measured gap; lines are the range that held in 95% of 4,000 resampled versions of the test.</figcaption>
 </figure>
 
-<p>I read a sample of the reviews where the two models disagreed. 5.2's real results are, if anything, a little stronger than the numbers above: twice the judge marked a bug as missed that 5.2's review had in fact named, and the two judge replies that failed to parse were both on 5.2's reviews.</p>
+<p>I read a sample of the judge's calls, including every kind of change from the first version of this test. I found no wrong hit or miss. The judge was a little harsh on 5.2's unsupported claims, though: it counts a hedged "I couldn't confirm X" as a claim, and 5.2 writes that way more often than 5.1.</p>
 
 <p>The table also shows 5.2 was cheaper per review. Here is where that comes from. Each review read the same input on both models, so the difference is in what they wrote back and what each token costs:</p>
 
 <div class="table-wrap">
 <table class="num">
 <tr><th>Per review, average of both runs</th><th>Fable 5.1</th><th>Fable 5.2</th><th>Result</th></tr>
-<tr><td>Input tokens</td><td>46,458</td><td>46,458</td><td>Same</td></tr>
-<tr><td>Output tokens, thinking included</td><td>about 7,100</td><td>about 7,800</td><td>5.2 writes about 9% more</td></tr>
+<tr><td>Input tokens</td><td>46,852</td><td>46,852</td><td>Same</td></tr>
+<tr><td>Output tokens, thinking included</td><td>about 7,400</td><td>about 7,900</td><td>5.2 writes about 7% more</td></tr>
 <tr><td>List price per million tokens, in / out</td><td>$10 / $50</td><td>$8 / $40</td><td>5.2 is 20% lower</td></tr>
-<tr><td>Cost per review, batch price</td><td>$0.41</td><td>$0.34</td><td>5.2 is 17% cheaper</td></tr>
+<tr><td>Cost per review, batch price</td><td>$0.42</td><td>$0.35</td><td>5.2 is 17% cheaper</td></tr>
 </table>
 </div>
 
-<p>Input is a little over half of the bill, because every review reads about 46,000 tokens of diff and files, and the lower price applies to all of it. That is why 9% more output still came out cheaper. The whole run, both models twice plus the judge, cost about $158 at batch price.</p>
+<p>Input is a little over half of the bill, because every review reads about 46,000 tokens of diff and files, and the lower price applies to all of it. That is why 7% more output still came out cheaper. The whole run, both models twice plus the judge, cost about $160 at batch price.</p>
 
 <p>The lower cost depends on the effort setting, though. At its default effort (high), on the earlier twelve-item run, 5.2 wrote about 70% more than 5.1. The break-even here is about 60% more, so at its default effort 5.2 would likely cost more per review. (I didn't measure whether that extra thinking finds more bugs.)</p>
 
@@ -163,6 +163,8 @@
 </ul>
 
 <p>It was enough for my own reviews, so I moved the pin with the same setting: <code>ANTHROPIC_DEFAULT_FABLE_MODEL=claude-fable-5-2</code>. I also kept <code>CLAUDE_CODE_SUBAGENT_EFFORT=medium</code>, so my reviews run at the effort I measured and not at 5.2's default (high).</p>
+
+<p><em>A previous version of this article used a suite in which my suite-building script attached the wrong ticket to 23 of the 82 reviews and none to 14. The numbers above are from two new runs on the corrected suite, on November 13. 5.2 still found 10 to 12 more blocking bugs than 5.1.</em></p>
     <p class="cta"><a href="https://www.linkedin.com/in/ocarlsen">Get in touch on LinkedIn</a></p>
   <p class="written">How this was written: Claude drafted from my notes; I edited the draft and checked every claim against the code and logs.</p>
   <footer>&copy; 2026 Owen Carlsen</footer>
