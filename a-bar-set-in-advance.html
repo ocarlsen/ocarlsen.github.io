@@ -21,19 +21,19 @@
   <p class="back"><a href="index.html">&larr; Owen Carlsen</a></p>
   <h1>A bar set in advance</h1>
   <p class="byline">Owen Carlsen &middot; Nov 2026</p>
-<p>In June I left Apple after 7 years to work full time on <a href="https://www.ocarlsen.com/cdh.html">Claire Daily Health</a>, which began as a plan for a regulated telehealth brand. I started it to find out whether agents could run a company's day to day, and the company was going to sell a simple consumer product to give them real work. The answer was yes: the agents ran the company from June to November. However, demand for the product never reached the bar we set, so in November I closed the company. Setting the bar in advance made the call easier.</p>
+<p>In June I left Apple after 7 years to work full time on <a href="https://www.ocarlsen.com/cdh.html">Claire Daily Health</a>, which began as a plan for a regulated telehealth brand. I started it because I wanted to try running a business myself, with agents doing the day-to-day work. I planned to learn firsthand where agents could help small businesses by running my own, then build tools for the needs I found. The agents ran the company from June to November, but demand never reached the bar we set, so in November I closed the company. Setting the bar in advance made the call easier.</p>
 
 <h2>Why I left</h2>
 
 <p>I loved working at Apple, and I wanted a new challenge. By the end of 2025 I was using agents every day, and I could see they would change how a company runs. I wanted to build that part myself and give it my best.</p>
 
-<p>I didn't line up another job first. I wanted experience as an "applied AI" engineer, even before I had heard that term, so I had to get it myself. I also wanted the experience of a first-time business owner. I admire people like my brother, who have started companies many times. Honestly, I wanted to own all the decisions, and I wanted to work with Claude full time, not around a day job.</p>
+<p>I didn't line up another job first. I wanted experience as an "applied AI" engineer, even before I had heard that term, so I had to get it myself. I was drawn to the business side too. I admire people like my brother, who have started companies many times. Honestly, I wanted to own all the decisions, and I wanted to work with Claude full time, not around a day job.</p>
 
 <h2>A company built to be run by agents</h2>
 
 <p>That spring I kept seeing the word "solopreneur", and I thought that could be me. Then a newspaper ran a story about a founder who built a very large company with almost no staff and AI doing much of the work. I gave the article to Claude and asked how we would do it. It laid out a plan: form an LLC, register the domains and find partners for a telehealth brand.</p>
 
-<p>The more I learned, the less telehealth fit. It needed heavy compliance work, and a medical product used at home carries real risk for the company behind it. I really wanted to build the agent layer, so the business itself became secondary. Nothing had launched yet, so we changed it.</p>
+<p>The more I learned, the less telehealth fit. It needed heavy compliance work, and a medical product used at home carries real risk for the company behind it. I really wanted to build the agent layer, so the telehealth plan became secondary. Nothing had launched yet, so we changed it.</p>
 
 <p>My partner and I picked a simple consumer product I could make with one contract manufacturer and sell from the site, so the whole business could run through the system. We worked out what paid customer acquisition would cost, and set a bar: a steady rate of organic sign-ups before the production order.</p>
 
@@ -49,7 +49,7 @@
 
 <p>From the first day, anything a model wrote for email reached only me. Every external email was a draft that I sent. Social posts followed the same rule: models drafted the captions and images, and I picked, edited and approved every post. The few automatic sends went to a fixed recipient or used copy I wrote, with no model text in them.</p>
 
-<p>The phone and chat agents were the exception, because they spoke to callers and site visitors directly. The chat bot could be asked for medical advice, which it must never give, so most of my testing went there. Its eval harness had zero-tolerance gates for fabrication, medical boundaries, privacy and over-refusal, and one failed answer would block it from going public. I checked the judge itself against 99 hand-labeled answers, to make sure I could trust its grades. When it passed answers I would have failed, I traced why and fixed the grading.</p>
+<p>The phone and chat agents were the exception, because they spoke to callers and site visitors directly. The chat bot could be asked for medical advice, which it was never allowed to give, so most of my testing went there. Its eval harness had zero-tolerance gates for fabrication, medical boundaries, privacy and over-refusal, and one failed answer would block it from going public. I checked the judge itself against 99 hand-labeled answers, to make sure I could trust its grades. When it passed answers I would have failed, I traced why and fixed the grading.</p>
 
 <p>From late June to November the system logged about 12,000 model calls. The job and call tables are on <a href="https://www.ocarlsen.com/cdh.html">my CDH page</a>.</p>
 
@@ -75,7 +75,7 @@
 
 <h2>What I'm taking with me</h2>
 
-<p>I'm taking the experience of building the agent layer, and the parts of it I've published. The company's own code stays private. I'm glad to walk through it on a call.</p>
+<p>By the fall I had found some of those gaps, and I met founders already building for them, which told me the need was real. I'm taking the experience of building the agent layer, and the parts of it I've published. The company's own code stays private. I'm glad to walk through it on a call.</p>
 
 <p><strong><a href="https://github.com/ocarlsen/session-notes">session-notes</a></strong> is the session tooling I extracted from my own setup. <code>/reflect</code> saves what a session learned and where things stand to the project's memory, so tomorrow's session does not start cold, and a few tmux commands let me answer every session from one keyboard. I use it every day.</p>
 
