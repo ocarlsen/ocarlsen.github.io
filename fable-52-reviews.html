@@ -164,6 +164,98 @@
 
 <p>It was enough for my own reviews, so I moved the pin with the same setting: <code>ANTHROPIC_DEFAULT_FABLE_MODEL=claude-fable-5-2</code>. I also kept <code>CLAUDE_CODE_SUBAGENT_EFFORT=medium</code>, so my reviews run at the effort I measured and not at 5.2's default (high).</p>
 
+<h2 id="gemini">Gemini 4 Carbon and Hydrogen</h2>
+
+<p>Then I ran Google's Gemini 4 Carbon and Gemini 4 Hydrogen on the same 82 diffs, with the same prompt, answer key and judge, at Google's medium thinking setting. Carbon ran twice, like Fable, and Hydrogen once.</p>
+
+<figure>
+<div class="table-wrap">
+<table class="num">
+<tr><th></th><th>Fable 5.1</th><th>Fable 5.2</th><th>Gemini 4 Carbon</th><th>Gemini 4 Hydrogen</th></tr>
+<tr><td>Blocking bugs found, of 124</td><td>98 / 98</td><td>108 / 110</td><td>95 / 97</td><td>69</td></tr>
+<tr><td>Claims the judge marked unsupported, per review</td><td>1.02 / 0.93</td><td>0.40 / 0.37</td><td>0.39 / 0.43</td><td>0.04</td></tr>
+<tr><td>List price per million tokens, in / out</td><td>$10 / $50</td><td>$8 / $40</td><td>$2 / $10<sup>*</sup></td><td>$1.50 / $7.50</td></tr>
+<tr><td>Cost per blocking bug found, list price</td><td>$0.70</td><td>$0.53 / $0.51</td><td>$0.21 / $0.20<sup>*</sup></td><td>$0.13</td></tr>
+<tr><td>Median time per review</td><td colspan="2">not recorded (batch)</td><td>3.7 / 3.2 minutes</td><td>32 seconds</td></tr>
+</table>
+</div>
+<figcaption><sup>*</sup> Through November 30</figcaption>
+</figure>
+
+<p>5.2 found 13 more blocking bugs than Carbon in each run, and neither range includes zero. Carbon found 3 fewer than 5.1 in run 1 and 1 fewer in run 2, both inside the margin of error:</p>
+
+<figure class="errorbars">
+<svg viewBox="0 0 640 260" role="img" aria-label="Fable minus Gemini 4 Carbon, blocking bugs found, with 95% bootstrap ranges. 5.2 run 1: +13, range +4 to +22. 5.2 run 2: +13, range +4 to +22. 5.1 run 1: +3, range -6 to +12. 5.1 run 2: +1, range -8 to +10.">
+  <line x1="120.0" y1="205" x2="600.0" y2="205" class="eb-axis"/>
+  <line x1="120.0" y1="205" x2="120.0" y2="210" class="eb-axis"/><text x="120.0" y="224" text-anchor="middle" class="eb-tick">&minus;10</text>
+  <line x1="188.6" y1="205" x2="188.6" y2="210" class="eb-axis"/><text x="188.6" y="224" text-anchor="middle" class="eb-tick">&minus;5</text>
+  <line x1="257.1" y1="205" x2="257.1" y2="210" class="eb-axis"/><text x="257.1" y="224" text-anchor="middle" class="eb-tick">0</text>
+  <line x1="325.7" y1="205" x2="325.7" y2="210" class="eb-axis"/><text x="325.7" y="224" text-anchor="middle" class="eb-tick">+5</text>
+  <line x1="394.3" y1="205" x2="394.3" y2="210" class="eb-axis"/><text x="394.3" y="224" text-anchor="middle" class="eb-tick">+10</text>
+  <line x1="462.9" y1="205" x2="462.9" y2="210" class="eb-axis"/><text x="462.9" y="224" text-anchor="middle" class="eb-tick">+15</text>
+  <line x1="531.4" y1="205" x2="531.4" y2="210" class="eb-axis"/><text x="531.4" y="224" text-anchor="middle" class="eb-tick">+20</text>
+  <line x1="600.0" y1="205" x2="600.0" y2="210" class="eb-axis"/><text x="600.0" y="224" text-anchor="middle" class="eb-tick">+25</text>
+  <line x1="257.1" y1="18" x2="257.1" y2="205" class="eb-zero"/>
+  <text x="262.1" y="14" class="eb-note">no difference</text>
+  <g class="eb-row" tabindex="0"><title>Run 1: 5.2 found +13 blocking bugs vs Carbon (95% range +4 to +22)</title>
+    <rect x="120.0" y="24" width="480.0" height="32" fill="transparent"/>
+    <text x="110" y="45" text-anchor="end" class="eb-label">5.2, run 1</text>
+    <line x1="312.0" y1="40" x2="558.9" y2="40" class="eb-whisker"/>
+    <line x1="312.0" y1="33" x2="312.0" y2="47" class="eb-whisker"/>
+    <line x1="558.9" y1="33" x2="558.9" y2="47" class="eb-whisker"/>
+    <circle cx="435.4" cy="40" r="6" class="eb-dot"/>
+    <text x="435.4" y="27" text-anchor="middle" class="eb-value">+13</text>
+    <text x="304.0" y="45" text-anchor="end" class="eb-end">+4</text>
+    <text x="566.9" y="45" text-anchor="start" class="eb-end">+22</text>
+  </g>
+  <g class="eb-row" tabindex="0"><title>Run 2: 5.2 found +13 blocking bugs vs Carbon (95% range +4 to +22)</title>
+    <rect x="120.0" y="69" width="480.0" height="32" fill="transparent"/>
+    <text x="110" y="90" text-anchor="end" class="eb-label">5.2, run 2</text>
+    <line x1="312.0" y1="85" x2="558.9" y2="85" class="eb-whisker"/>
+    <line x1="312.0" y1="78" x2="312.0" y2="92" class="eb-whisker"/>
+    <line x1="558.9" y1="78" x2="558.9" y2="92" class="eb-whisker"/>
+    <circle cx="435.4" cy="85" r="6" class="eb-dot"/>
+    <text x="435.4" y="72" text-anchor="middle" class="eb-value">+13</text>
+    <text x="304.0" y="90" text-anchor="end" class="eb-end">+4</text>
+    <text x="566.9" y="90" text-anchor="start" class="eb-end">+22</text>
+  </g>
+  <g class="eb-row" tabindex="0"><title>Run 1: 5.1 found +3 blocking bugs vs Carbon (95% range &minus;6 to +12)</title>
+    <rect x="120.0" y="114" width="480.0" height="32" fill="transparent"/>
+    <text x="110" y="135" text-anchor="end" class="eb-label">5.1, run 1</text>
+    <line x1="174.9" y1="130" x2="421.7" y2="130" class="eb-whisker"/>
+    <line x1="174.9" y1="123" x2="174.9" y2="137" class="eb-whisker"/>
+    <line x1="421.7" y1="123" x2="421.7" y2="137" class="eb-whisker"/>
+    <circle cx="298.3" cy="130" r="6" class="eb-dot"/>
+    <text x="298.3" y="117" text-anchor="middle" class="eb-value">+3</text>
+    <text x="166.9" y="135" text-anchor="end" class="eb-end">&minus;6</text>
+    <text x="429.7" y="135" text-anchor="start" class="eb-end">+12</text>
+  </g>
+  <g class="eb-row" tabindex="0"><title>Run 2: 5.1 found +1 blocking bugs vs Carbon (95% range &minus;8 to +10)</title>
+    <rect x="120.0" y="159" width="480.0" height="32" fill="transparent"/>
+    <text x="110" y="180" text-anchor="end" class="eb-label">5.1, run 2</text>
+    <line x1="147.4" y1="175" x2="394.3" y2="175" class="eb-whisker"/>
+    <line x1="147.4" y1="168" x2="147.4" y2="182" class="eb-whisker"/>
+    <line x1="394.3" y1="168" x2="394.3" y2="182" class="eb-whisker"/>
+    <circle cx="270.9" cy="175" r="6" class="eb-dot"/>
+    <text x="270.9" y="162" text-anchor="middle" class="eb-value">+1</text>
+    <text x="139.4" y="180" text-anchor="end" class="eb-end">&minus;8</text>
+    <text x="402.3" y="180" text-anchor="start" class="eb-end">+10</text>
+  </g>
+  <text x="360.0" y="250" text-anchor="middle" class="eb-note">Fable minus Gemini 4 Carbon, blocking bugs found</text>
+</svg>
+<figcaption>Each Fable run is paired with the Carbon run of the same number. Dots are the measured gap; lines are the 95% range.</figcaption>
+</figure>
+
+<p>Hydrogen was fast and cheap, but it missed 55 of the 124. Its reviews were short, and it made few unsupported claims.</p>
+
+<p>The costs in this table are list price, twice the batch price in the tables above. Google's batch price is also half of list.</p>
+
+<p>Carbon needed a bigger output budget than Fable got. At Fable's 20,000 tokens, it spent the whole budget thinking and returned no review on all four items of a sample, so both Gemini models got 64,000. In its two runs, 43 and 37 of Carbon's 82 reviews used more than 20,000.</p>
+
+<p>The judge is an Anthropic model grading Google's models, and the answer key leans toward Fable. I read four of Carbon's misses, chosen at random, and the judge was right on all four.</p>
+
+<p>I kept my reviewer on Fable 5.2.</p>
+
 <p><em>A previous version of this article used a suite in which my suite-building script attached the wrong ticket to 23 of the 82 reviews and none to 14. The numbers above are from two new runs on the corrected suite, on November 13. 5.2 still found 10 to 12 more blocking bugs than 5.1.</em></p>
     <p class="cta"><a href="https://www.linkedin.com/in/ocarlsen">Get in touch on LinkedIn</a></p>
   <p class="written">How this was written: Claude drafted from my notes; I edited the draft and checked every claim against the code and logs.</p>
