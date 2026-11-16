@@ -29,7 +29,7 @@
 
 <p>The split between model and code was deliberate. A model did the judgment: reading a message and deciding what it asked for, writing the brief, reviewing a diff, drafting a post. Plain Python did the mechanics around it: the Gmail and Slack reads, the ledger writes, the schedules, the backups and the checks. 25 of the 105 jobs called a model, and the other 80 were plain Python.</p>
 
-<p>About half of the jobs were canaries. Each one tested one thing and posted to Slack only when the test failed, so a quiet channel meant the pipeline was healthy.</p>
+<p>About half of the jobs were canaries. Each one tested one thing and posted to Slack only when the test failed, so a quiet channel meant every check had passed.</p>
 
 <div class="table-wrap"><table>
 <thead><tr><th>Jobs</th><th>Count</th><th>Called a model</th><th>One example</th></tr></thead>
@@ -71,11 +71,11 @@
 
 <h2>Alerts</h2>
 
-<p>The canaries and the reports posted 596 alerts of 85 kinds to Slack between late June and November. 71 percent got an automatic follow-up: a worker read the logs behind the alert and posted a recommended fix in the alert's thread, with a one-tap approval to run it. Every consequential action worked that way, human in the loop: data deletions, model switches and eval runs waited on my tap, and code, not a model, ran the action I had approved.</p>
+<p>The canaries and the reports posted 596 alerts of 85 kinds to Slack between late June and November. 71 percent got an automatic follow-up: a worker read the logs behind the alert and posted a recommended fix in the alert's thread, with a one-tap approval to run it. Every consequential action a model proposed worked that way, human in the loop: data deletions, model switches and eval runs waited on my tap, and code, not a model, ran the action I had approved. The one deletion without a tap was the retention backstop, a daily job with no model in it that deleted personal data once it passed the published window.</p>
 
 <h2>Agents and evals</h2>
 
-<p>I built the company's AI voice and chat agents and an eval harness for them. The chat agent answered from a knowledge base built from the company's own web pages, retrieved for each question (RAG), and every eval run first checked in code that retrieval was on and the index was built. The harness held 131 probes in nine suites: 82 grounding questions generated from the company's own content, and hand-written suites for fabrication, medical boundaries, privacy wording, over-refusal, persona and conversation mechanics. An LLM judge (LLM-as-a-judge) read each answer against the source text and returned its pass or fail as JSON in a fixed schema (structured outputs). Four suites were zero-tolerance gates, 29 probes in all, and one fail would block the agent from going public.</p>
+<p>I built the company's AI voice and chat agents, and an eval harness for the chat agent. The chat agent answered from a knowledge base built from the company's own web pages, retrieved for each question (RAG), and every eval run first checked in code that retrieval was on and the index was built. The harness held 131 probes in nine suites: 82 grounding questions generated from the company's own content, and hand-written suites for fabrication, medical boundaries, privacy wording, over-refusal, persona and conversation mechanics. An LLM judge (LLM-as-a-judge) read each answer against the source text and returned its pass or fail as JSON in a fixed schema (structured outputs). Four suites were zero-tolerance gates, 29 probes in all, and one fail would block the agent from going public.</p>
 
 <p>The harness tested two things: the agent, and the judge that graded it.</p>
 
@@ -114,7 +114,7 @@
 
 <p>I ran many Claude Code sessions in parallel, one per project. The tooling that keeps their memory current across sessions, and lets me answer them all from one session, is open source as <a href="https://github.com/ocarlsen/session-notes">session-notes</a>.</p>
 
-<p>The company&rsquo;s code is private. The parts that generalize I&rsquo;ve published as open source: <a href="https://github.com/ocarlsen/session-notes">session-notes</a>, <a href="https://github.com/ocarlsen/pinbench">pinbench</a> and <a href="https://ocarlsen.ai/frontdesk.html">FrontDesk</a>. On a call I&rsquo;m glad to walk through the rest, and through the GitHub history and vendor consoles that show it running from June to November 2026. To see the sessions at work, the <a href="https://github.com/ocarlsen/session-notes">session-notes</a> README has a film of about five minutes of real Claude Code sessions.</p>
+<p>The company&rsquo;s code is private. The parts that generalize I&rsquo;ve published as open source: <a href="https://github.com/ocarlsen/session-notes">session-notes</a>, <a href="https://github.com/ocarlsen/pinbench">pinbench</a> and <a href="https://ocarlsen.ai/frontdesk.html">FrontDesk</a>, an inbox agent built from scratch on the same rules. On a call I&rsquo;m glad to walk through the rest, and through the GitHub history and vendor consoles that show it running from June to November 2026. To see the sessions at work, the <a href="https://github.com/ocarlsen/session-notes">session-notes</a> README has a film of about five minutes of real Claude Code sessions.</p>
     <p class="cta"><a href="https://www.linkedin.com/in/ocarlsen">Get in touch on LinkedIn</a></p>
   <p class="written">How this was written: Claude drafted from my notes; I edited the draft and checked every claim against the code and logs.</p>
   <footer>&copy; 2026 Owen Carlsen</footer>
