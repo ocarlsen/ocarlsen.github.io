@@ -24,7 +24,9 @@
   <p class="back"><a href="index.html">&larr; Owen Carlsen</a></p>
   <h1>Fable 5.2 vs 5.1 on 124 bugs from my own pull requests</h1>
   <p class="byline">Owen Carlsen &middot; Nov 2026</p>
-<p>Anthropic released Claude Fable 5.2 on November 9. Fable reviews my pull requests (PRs), as a Claude Code subagent, so the first thing I wanted to know was whether to switch. Then I found that I had never pinned the reviewer's model. The reviews ran through Claude Code's <code>fable</code> alias. On the version I had, that alias resolved to Fable 5.1. The changelog for the release that adds 5.2 says the alias moves to 5.2. My reviewer would have changed on release day and nothing in my repo would have said so.</p>
+<p>I switched my pull request (PR) reviewer from Claude Fable 5.1 to 5.2 after testing both on 82 reviews from my own PRs. In two runs each, 5.2 found 108 and 110 of 124 known blocking bugs, and 5.1 found 98 both times. At medium effort, 5.2 also cost 17% less per review.</p>
+
+<p>Anthropic <a href="https://www.anthropic.com/claude-fable-and-mythos-5-2">released Fable 5.2</a> on November 9. Fable reviews my PRs as a Claude Code subagent, so naturally I wanted to know whether to switch, and I decided to test it. But before I could even do that, I realized I had never pinned the reviewer's model. The reviews ran through Claude Code's <code>fable</code> alias. On the version I had, that alias resolved to Fable 5.1. The <a href="https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#21321">changelog</a> for the release that adds 5.2 says the alias moves to 5.2. My reviewer would have changed on release day and nothing in my repo would have said so.</p>
 
 <p>That is the exact failure I built <a href="https://github.com/ocarlsen/pinbench">pinbench</a> to prevent. Pinbench is a command-line tool that compares two pinned models on my own tasks, and I wrote about pinning in <a href="https://www.ocarlsen.com/model-upgrades.html">Upgrading production models without guessing</a>. So I pinned the alias to 5.1 before updating, with one setting: <code>ANTHROPIC_DEFAULT_FABLE_MODEL=claude-fable-5-1</code>. Then I measured the two models the way pinbench always does: through the Claude API, each model ID pinned, at the effort my reviews already ran at.</p>
 
@@ -50,7 +52,7 @@
 
 <p>I ran a one-person company, now closed, whose operations ran on <a href="https://www.ocarlsen.com/cdh.html">about a hundred scheduled jobs</a>. Most of that code was written by AI agents, and PRs were reviewed by a model before they merged. A PR could be reviewed more than once, and each review was a round. When the reviewer found something, the agent that requested the review fixed it in a commit of its own, with a message like "review round 1: ..." naming what it fixed.</p>
 
-<p>I used those commits as the answer key. For each one, I rebuilt the diff the reviewer saw just before the fix. A model then wrote down each defect the fix corrected, as a description of what was wrong in the code. On the PRs I tested, that came to 209 total defects, which I bucketed into <i>blocking</i> and <i>non-blocking</i>.</p>
+<p>I used those commits as the answer key. For each one, I rebuilt the diff the reviewer saw just before the fix. A model then wrote down each defect the fix corrected, as a description of what was wrong in the code. I tested 82 of those reviews, from PRs for 60 tickets. They came to 209 total defects, which I bucketed into <i>blocking</i> and <i>non-blocking</i>.</p>
 
 <p>A blocking bug is one that should stop a merge: wrong behavior on a realistic input, lost data, a message sent that shouldn't have been, or a safety check that lets things through when it should block them. The rest are smaller defects like a stale comment or a missing test. The headline score uses the blocking bugs that are visible in what the reviewer was given, without running any code, of which there were 124.</p>
 
@@ -60,7 +62,7 @@
 
 <p>I first ran a smaller, twelve-item version of this test, and it found four problems. I fixed each one before the full run:</p>
 <ol>
-<li>Thinking used up the output budget. Both models think before they answer, and at the default effort (high), several reviews spent the whole 16,000-token ceiling thinking and returned nothing. Pinbench refused to score them instead of counting them as misses. The full run uses a higher ceiling and <i>medium</i> effort.</li>
+<li>Thinking used up the output budget. Both models think before they answer, and at the default effort (high), several reviews spent the whole 16,000-token ceiling thinking and returned nothing. Pinbench refused to score them instead of counting them as misses. The full run uses a 20,000-token ceiling and <i>medium</i> effort, the effort my reviews already ran at. So the results compare the two models at my setting, not at their defaults.</li>
 <li>Each call took from 1-4 minutes, but pinbench had a fixed 60-second timeout (now configurable, <a href="https://github.com/ocarlsen/pinbench/issues/8">issue #8</a>). So, for the full run, I added <a href="https://platform.claude.com/docs/en/build-with-claude/batch-processing">Batch API</a> support to pinbench. A batch has no per-call timeout, and it costs half as much.</li>
 <li>The prompts I had first used gave away some of the answers. The review requests written at the time named what to look for, and more than half of the defects were hinted at this way. The final suite uses one neutral prompt.</li>
 <li>Each model got the PR's diff plus the full text of some files. At first, the only files shown in full were the ones the fix changed: the buggy ones, in other words. That told the model where to look. Claude Opus 5.5 caught this in a design review. The final version shows the full text of every file the PR changed, the same files a reviewer would open, chosen without looking at the fix.</li>
@@ -68,23 +70,30 @@
 
 <h2>Results</h2>
 
+<p><em>Correction, November 13: my suite-building script attached the wrong ticket to 23 of the 82 reviews and none to 14. I fixed the suite and ran both Fable models twice more. Every Fable number below is from those two runs, and 5.2 still found 10 to 12 more blocking bugs than 5.1.</em></p>
+
 <p>Both models ran at medium effort (the API's <code>effort</code> setting), the level all my past reviews used. I ran each model twice, to see how much a score changes between two runs of the same model.</p>
 
+<figure>
 <div class="table-wrap">
 <table class="num">
 <tr><th></th><th>Fable 5.1</th><th>Fable 5.2</th><th>5.2 vs 5.1</th></tr>
-<tr><td>Blocking bugs found, of 124 (run 1 / run 2)</td><td>98 / 98 (79%)</td><td>108 / 110 (88%)</td><td>+10 / +12</td></tr>
+<tr><td>Blocking bugs found, of 124<br><span style="white-space:nowrap">(run 1 / run 2; recall)</span></td><td>98 / 98<br>(79% / 79%)</td><td>108 / 110<br>(87% / 89%)</td><td>+10 / +12</td></tr>
 <tr><td>All defects found, of 209</td><td>138 / 134</td><td>155 / 155</td><td>+17 / +21</td></tr>
-<tr><td>Claims the judge marked unsupported, per review</td><td>1.02 / 0.93</td><td>0.40 / 0.37</td><td>&minus;0.62 / &minus;0.56</td></tr>
+<tr><td>False positives per review<sup>*</sup></td><td>1.02 / 0.93</td><td>0.40 / 0.37</td><td>&minus;0.62 / &minus;0.56</td></tr>
 <tr><td>Cost per review, batch price</td><td>$0.42</td><td>$0.35</td><td>&minus;$0.07</td></tr>
 <tr><td>Cost per blocking bug found</td><td>$0.35</td><td>$0.26</td><td>&minus;$0.09</td></tr>
 <tr><td>Output tokens per review, thinking included</td><td>about 7,400</td><td>about 7,900</td><td>about +500</td></tr>
 </table>
 </div>
+<figcaption><sup>*</sup> Reported bugs that were wrong, or that the judge couldn't verify from the code the model saw. Real bugs missing from the answer key don't count. These were the judge's calls, and I did not check each one.</figcaption>
+</figure>
+
+<p>The bugs-found rows measure recall, the share of known bugs a review caught. The false positive row is the precision side: how often a review flags something that isn't a bug. 5.2 did better on both.</p>
 
 <p>Running each model twice shows how much a score moves on its own: 5.1 found the same number of blocking bugs both times, and 5.2 found two more the second time.</p>
 
-<p>With only 124 bugs, the gap between the two models has a wide margin of error. To size it, I used a bootstrap: 4,000 pretend versions of the test, built by drawing tickets at random from the real ones. In 95% of them, the range was +2 to +19 in the first run, and +4 to +20 in the second. Neither range includes zero.</p>
+<p>With only 124 bugs, the gap between the two models has a wide margin of error. To size it, I used a bootstrap: 4,000 pretend versions of the test, each built by drawing tickets at random, with replacement, from the 60 real ones. In 95% of them, the range was +2 to +19 in the first run, and +4 to +20 in the second. Neither range includes zero. More draws didn't change it: 10,000 gave the same range.</p>
 
 <figure class="errorbars">
 <svg viewBox="0 0 640 170" role="img" aria-label="Fable 5.2 minus Fable 5.1, blocking bugs found, with 95% bootstrap ranges. Run 1: +10, range +2 to +19. Run 2: +12, range +4 to +20.">
@@ -135,7 +144,7 @@
 <figcaption>Dots are the measured gap; lines are the range that held in 95% of 4,000 resampled versions of the test.</figcaption>
 </figure>
 
-<p>I read a sample of the judge's calls, including every kind of change from the first version of this test. I found no wrong hit or miss. The judge was a little harsh on 5.2's unsupported claims, though: it counts a hedged "I couldn't confirm X" as a claim, and 5.2 writes that way more often than 5.1.</p>
+<p>I read a sample of the judge's calls, including every kind of change from the first version of this test. I found no wrong hit or miss. The judge was a little harsh on 5.2's false positives, though: it counts a hedged "I couldn't confirm X" as a finding, and 5.2 writes that way more often than 5.1.</p>
 
 <p>The table also shows 5.2 was cheaper per review. Here is where that comes from. Each review read the same input on both models, so the difference is in what they wrote back and what each token costs:</p>
 
@@ -164,16 +173,16 @@
 
 <p>It was enough for my own reviews, so I moved the pin with the same setting: <code>ANTHROPIC_DEFAULT_FABLE_MODEL=claude-fable-5-2</code>. I also kept <code>CLAUDE_CODE_SUBAGENT_EFFORT=medium</code>, so my reviews run at the effort I measured and not at 5.2's default (high).</p>
 
-<h2 id="gemini">Gemini 4 Carbon and Hydrogen</h2>
+<h2 id="gemini">Update, November 14: Gemini 4 Carbon and Hydrogen</h2>
 
-<p>Then I ran Google's Gemini 4 Carbon and Gemini 4 Hydrogen on the same 82 diffs, with the same prompt, answer key and judge, at Google's medium thinking setting. Carbon ran twice, like Fable, and Hydrogen once.</p>
+<p>Google released <a href="https://blog.google/innovation-and-ai/technology/developers-tools/gemini-4-carbon-developers/">Gemini 4 Carbon</a> on November 10 and <a href="https://blog.google/innovation-and-ai/technology/developers-tools/build-with-gemini-4-hydrogen/">Gemini 4 Hydrogen</a> on November 12. I ran both on the same 82 diffs, with the same prompt, answer key and judge, at Google's medium thinking setting. Carbon ran twice, like Fable, and Hydrogen once, since it trailed Carbon by 26 blocking bugs and a second run wouldn't change its place.</p>
 
 <figure>
 <div class="table-wrap">
 <table class="num">
 <tr><th></th><th>Fable 5.1</th><th>Fable 5.2</th><th>Gemini 4 Carbon</th><th>Gemini 4 Hydrogen</th></tr>
 <tr><td>Blocking bugs found, of 124</td><td>98 / 98</td><td>108 / 110</td><td>95 / 97</td><td>69</td></tr>
-<tr><td>Claims the judge marked unsupported, per review</td><td>1.02 / 0.93</td><td>0.40 / 0.37</td><td>0.39 / 0.43</td><td>0.04</td></tr>
+<tr><td>False positives per review</td><td>1.02 / 0.93</td><td>0.40 / 0.37</td><td>0.39 / 0.43</td><td>0.04</td></tr>
 <tr><td>List price per million tokens, in / out</td><td>$10 / $50</td><td>$8 / $40</td><td>$2 / $10<sup>*</sup></td><td>$1.50 / $7.50</td></tr>
 <tr><td>Cost per blocking bug found, list price</td><td>$0.70</td><td>$0.53 / $0.51</td><td>$0.21 / $0.20<sup>*</sup></td><td>$0.13</td></tr>
 <tr><td>Median time per review</td><td colspan="2">not recorded (batch)</td><td>3.7 / 3.2 minutes</td><td>32 seconds</td></tr>
@@ -246,7 +255,7 @@
 <figcaption>Each Fable run is paired with the Carbon run of the same number. Dots are the measured gap; lines are the 95% range.</figcaption>
 </figure>
 
-<p>Hydrogen was fast and cheap, but it missed 55 of the 124. Its reviews were short, and it made few unsupported claims.</p>
+<p>Hydrogen was fast and cheap, but it missed 55 of the 124. Its reviews were short, and it had few false positives.</p>
 
 <p>The costs in this table are list price, twice the batch price in the tables above. Google's batch price is also half of list.</p>
 
@@ -255,8 +264,6 @@
 <p>The judge is an Anthropic model grading Google's models, and the answer key leans toward Fable. I read four of Carbon's misses, chosen at random, and the judge was right on all four.</p>
 
 <p>I kept my reviewer on Fable 5.2.</p>
-
-<p><em>A previous version of this article used a suite in which my suite-building script attached the wrong ticket to 23 of the 82 reviews and none to 14. The Fable numbers above are from two new runs on the corrected suite, on November 13. 5.2 still found 10 to 12 more blocking bugs than 5.1.</em></p>
     <p class="cta"><a href="https://www.linkedin.com/in/ocarlsen">Get in touch on LinkedIn</a></p>
   <p class="written">How this was written: Claude drafted from my notes; I edited the draft and checked every claim against the code and logs.</p>
   <footer>&copy; 2026 Owen Carlsen</footer>
