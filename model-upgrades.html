@@ -21,13 +21,15 @@
   <p class="back"><a href="index.html">&larr; Owen Carlsen</a></p>
   <h1>Upgrading production models without guessing</h1>
   <p class="byline">Owen Carlsen &middot; Oct 2026</p>
+<p>In September I tested which model should judge my chat agent's answers for fabrication, against 99 answers I had labeled by hand. Claude Opus 5.5, the newer model, agreed with my labels on 83.8% of them, and Claude Opus 4.8 on 88.9%. Opus 5.5 also passed an answer with an invented product detail that Opus 4.8 caught. It was enough to keep Opus 4.8 as the judge. (That is one task and my own labels, and a gap that size could be noise, so it says nothing about which model is better in general.)</p>
+
 <p>Every few weeks, one of the model vendors I depend on ships something new. At first I read the announcement, tried a few prompts, and switched if it felt better. That works until a new model is worse at your task and a user tells you.</p>
 
-<p>The company I run operates on LLM pipelines: email and Slack triage, code review, captions, images, video and invoices. So I built a process for it. A job checks every vendor's model list every hour. When a newer model appears in a slot I use, I get a one-tap prompt to benchmark it against the current model on a frozen set of my own tasks. Nothing switches until a blind comparison supports it. The switch is a pull request I review, and the canaries that already watch every job's behavior keep watching it afterward.</p>
+<p>The company I ran, now closed, operated on LLM pipelines: email and Slack triage, code review, captions, images, video and invoices. So I built a process for it. A job checks every vendor's model list every hour. When a newer model appears in a slot I use, I get a one-tap prompt to benchmark it against the current model on a frozen set of my own tasks. Nothing switches until a blind comparison supports it. The switch is a pull request I review, and the canaries that already watch every job's behavior keep watching it afterward.</p>
 
 <h2>Pin every model</h2>
 
-<p>Every job calls an exact model version. None uses a floating "latest" alias. An alias is an upgrade you never approved. If a vendor repoints it, your job changes behavior overnight and nothing in your repo says why. Some vendors make this easy to avoid. Anthropic now ships every model ID as "a pinned snapshot" (<a href="https://platform.claude.com/docs/en/about-claude/models/overview">Anthropic, "Models overview"</a>). That doesn't stop your own code from defining a "latest" of its own.</p>
+<p>Every job calls an exact model version. None uses a floating "latest" alias. An alias is an upgrade you never approved. If a vendor repoints it, your job changes behavior overnight and nothing in your repo says why. If my fabrication judge had followed a "latest" alias, it would have moved to Opus 5.5 on release day without a test. Some vendors make this easy to avoid. Anthropic now ships every model ID as "a pinned snapshot" (<a href="https://platform.claude.com/docs/en/about-claude/models/overview">Anthropic, "Models overview"</a>). That doesn't stop your own code from defining a "latest" of its own.</p>
 
 <p>Each pin belongs to a slot, a named role such as "the model that drafts captions" or "the model that judges code reviews", and the pins live in one registry in code. Once an hour, a watcher compares each vendor's published model list against that registry and flags two things: a pinned model the vendor no longer lists, and a newer model from the same family as one I've pinned. It also reads the vendors' announcement feeds, and it makes no model calls.</p>
 
@@ -39,8 +41,6 @@
 
 <p>A single command takes any one harness and runs its frozen inputs through two models: the one in production now and the candidate. Before it spends anything, it estimates the cost of the run, scaled by the candidate's price, and refuses to start if the estimate is over a fixed cap.</p>
 
-<p>When I tested which model should judge my voice and chat agents' answers for fabrication, against 99 answers I had labeled by hand, the newest flagship agreed with my labels less often than the older one it would have replaced (83.8% against 88.9%), and it passed an answer containing an invented product detail that the older one caught. If that judge had followed a "latest" alias, it would have gotten worse on the day of the release.</p>
-
 <h2>Judge blind</h2>
 
 <p>Captions, images and video are judgment calls, so I judge them myself, on a voting page the harness builds for each run. It shows each pair of outputs as A and B, randomized per input, with the key held on the server so I can't peek. I vote A, B or tie, and the tally appears only after every input has a vote.</p>
@@ -49,7 +49,7 @@
 
 <h2>The first decision was a tie</h2>
 
-<p>The first candidate through the pipeline was a newer OpenAI model for the caption slot, a public-facing job that runs every time the company posts. At OpenAI's published prices it cost half as much as the model it would replace: $2 per million input tokens against $4, and $10 per million output tokens against $20 (<a href="https://developers.openai.com/api/docs/pricing">OpenAI, "Pricing"</a>).</p>
+<p>The first candidate through the pipeline was OpenAI's GPT-6.1 Sol, for the caption slot, a public-facing job that ran every time the company posted. At OpenAI's published prices it cost half as much as GPT-5.6 Sol, the model it would replace: $2 per million input tokens against $4, and $10 per million output tokens against $20 (<a href="https://developers.openai.com/api/docs/pricing">OpenAI, "Pricing"</a>).</p>
 
 <p>At half the price it only had to match the current model, so I judged it on captions, the job it would do.</p>
 
@@ -57,9 +57,9 @@
 
 <p>Thirteen votes can only catch a large regression. A modest one would not show at that size. A side check on code review pointed the same way: across 12 planted defects the new model caught 9 and the current one caught 10, while the new model raised about a third as many unplanted flags.</p>
 
-<p>I accepted the remaining uncertainty because the downside was bounded. Each post starts from five candidate captions, each drafted by a different model, and a person picks one and edits it. The OpenAI model writes only one of the five, so a weaker model loses picks, not posts. The behavior canaries that watch every job kept watching this one, and rolling back is reverting one pull request. In the two weeks since, it has run cleanly every time.</p>
+<p>I accepted the remaining uncertainty because the downside was bounded. Each post started from five candidate captions, each drafted by a different model, and a person picked one and edited it. The OpenAI model wrote only one of the five, so a weaker model would lose picks, not posts. A canary alerted me if any caption model returned an error instead of a caption, and rolling back was reverting one pull request. In the two weeks after the switch, the new model returned a caption every time. The canary doesn't judge quality, though. That check was the person picking among the five.</p>
 
-<p>The pipeline has also rejected a candidate. A later one from another vendor lost 4 to 6, with 3 ties, and I kept the current model.</p>
+<p>The pipeline has also rejected a candidate. Later, Meta's Muse Wonder 1.0 lost 4 to 6 against Muse Spark 1.3, with 3 ties. That doesn't show it was worse, but it gave me no reason to switch, so I kept the current model.</p>
 
 <h2>What changes besides quality</h2>
 
